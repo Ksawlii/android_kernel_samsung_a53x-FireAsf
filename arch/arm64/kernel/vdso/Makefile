@@ -43,6 +43,8 @@ ifneq ($(c-gettimeofday-y),)
   CFLAGS_vgettimeofday.o += -include $(c-gettimeofday-y)
 endif
 
+CFLAGS_REMOVE_vgettimeofday.o += $(CC_FLAGS_SCS)
+
 # Disable gcov profiling for VDSO code
 GCOV_PROFILE := n
 
