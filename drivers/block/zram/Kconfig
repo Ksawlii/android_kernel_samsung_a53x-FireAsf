@@ -2,7 +2,11 @@
 config ZRAM
 	tristate "Compressed RAM block device support"
 	depends on BLOCK && SYSFS && ZSMALLOC && CRYPTO
+<<<<<<< HEAD
 	select CRYPTO_ZSTD
+=======
+	select CRYPTO_LZ4
+>>>>>>> 3413b95770db (zram: Set default compressor to lz4)
 	help
 	  Creates virtual block devices called /dev/zramX (X = 0, 1, ...).
 	  Pages written to these disks are compressed and stored in memory
