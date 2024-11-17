@@ -1,6 +1,6 @@
 #!/bin/bash
 echo -e "If you have some errors when trying to rebuild, delete ./out dir"
-
+echo ""
 FIRE_VERSION="1.0"
 
 set -e
@@ -18,6 +18,7 @@ fi
 
 export PATH="$(pwd)/kernel_build/bin:$PATH"
 
+echo -e "Check in btop, htop, top (whatever you use) if its building."
 # Configs
 OUTDIR="$(pwd)/out"
 MODULES_OUTDIR="$(pwd)/modules_out"
