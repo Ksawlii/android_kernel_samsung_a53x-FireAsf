@@ -46,7 +46,6 @@ BUILD_ARGS="LOCALVERSION=-FireAsf-${FIRE_VERSION} KBUILD_BUILD_USER=Ksawlii KBUI
 
 kfinish() {
     rm -rf "$TMPDIR"
-    rm -rf "$OUTDIR"
     rm -rf "$MODULES_OUTDIR"
 }
 
