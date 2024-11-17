@@ -1,3 +1,42 @@
 #!/bin/bash
 
-./kernel_build/build.sh "$(pwd)" || exit 1
+command_one() {
+    echo "Building with Debug Logs..."
+    ./kernel_build/build.sh "$(pwd)" || exit 1
+}
+
+command_two() {
+    echo "Building without Debug Logs..."
+    ./kernel_build/build-nodebug.sh "$(pwd)" || exit 1
+}
+
+command_three() {
+    echo "Exiting, really that quickly? :sob:"
+}
+
+# Main loop
+while true; do
+    echo ""
+    echo "Choose what to do:"
+    echo "1: Build FireAsf kernel with Debug Logs"
+    echo "2: Build FireAsf kernel without Debug Logs"
+    echo "Type 'exit' to guess what? Exit, yeah exit!"
+    read -p "Make a good choice: " choice
+
+    case $choice in
+        1)
+            command_one
+            ;;
+        2)
+            command_two
+            ;;
+        exit)
+            echo "Exiting the program. Goodbye!"
+            break
+            ;;
+        *)
+            echo "Invalid. Learn how to type."
+            ;;
+    esac
+done
+
