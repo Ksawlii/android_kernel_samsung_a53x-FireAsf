@@ -6,8 +6,7 @@ command_one() {
 }
 
 command_two() {
-    echo "Building without Debug Logs..."
-    ./kernel_build/build-nodebug.sh "$(pwd)" || exit 1
+    echo "Disabled temporary"
 }
 
 command_three() {
