@@ -62,7 +62,9 @@ static int zram_major;
 static const char *default_compressor = "lzo-rle";
 
 static bool is_lzorle;
+#ifdef CONFIG_ZRAM_LRU_WRITEBACK
 static unsigned char lzo_marker[4] = {0x11, 0x00, 0x00};
+#endif
 
 /* Module params (documentation at end) */
 static unsigned int num_devices = 1;
@@ -2967,10 +2969,12 @@ static int __zram_bvec_read(struct zram *zram, struct page *page, u32 index,
 		zcomp_stream_put(zram->comp);
 	}
 
+#ifdef CONFIG_ZRAM_LRU_WRITEBACK
 	/* Should NEVER happen. BUG() if it does. */
 	if (unlikely(ret))
 		handle_decomp_fail(zram->compressor, ret, index, src, size,
 				   NULL);
+#endif
 
 	zs_unmap_object(zram->mem_pool, handle);
 #ifdef CONFIG_ZRAM_LRU_WRITEBACK
@@ -3681,6 +3685,11 @@ static int zram_add(void)
 	if (ret < 0)
 		goto out_free_dev;
 	device_id = ret;
+
+	if (device_id >= 1) {
+		ret = -ENOMEM;
+		goto out_free_idr;
+	}
 
 	init_rwsem(&zram->init_lock);
 #ifdef CONFIG_ZRAM_WRITEBACK

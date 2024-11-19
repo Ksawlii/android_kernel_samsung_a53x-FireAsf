@@ -80,7 +80,7 @@ static inline void decrement_wakelocks_number(void) {}
 
 #ifdef CONFIG_PM_WAKELOCKS_GC
 #define WL_GC_COUNT_MAX	100
-#define WL_GC_TIME_SEC	300
+#define WL_GC_TIME_SEC	120 /* default : 300s */
 
 static void __wakelocks_gc(struct work_struct *work);
 static LIST_HEAD(wakelocks_lru_list);
@@ -238,7 +238,7 @@ int pm_wake_lock(const char *buf)
 		do_div(timeout_ms, NSEC_PER_MSEC);
 		__pm_wakeup_event(wl->ws, timeout_ms);
 	} else {
-		__pm_stay_awake(wl->ws);
+		__pm_wakeup_event(wl->ws, 500);
 	}
 
 	wakelocks_lru_most_recent(wl);

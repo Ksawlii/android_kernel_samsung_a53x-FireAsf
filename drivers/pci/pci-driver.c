@@ -444,6 +444,7 @@ static int pci_device_remove(struct device *dev)
 	struct pci_dev *pci_dev = to_pci_dev(dev);
 	struct pci_driver *drv = pci_dev->driver;
 
+
 	if (drv) {
 		if (drv->remove) {
 			pm_runtime_get_sync(dev);
@@ -454,6 +455,7 @@ static int pci_device_remove(struct device *dev)
 		pci_dev->driver = NULL;
 		pci_iov_remove(pci_dev);
 	}
+
 
 	/* Undo the runtime PM settings in local_pci_probe() */
 	pm_runtime_put_sync(dev);
