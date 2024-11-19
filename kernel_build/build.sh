@@ -1,7 +1,7 @@
 #!/bin/bash
+echo -e ""
 echo -e "If you have some errors when trying to rebuild, delete ./out dir"
-echo ""
-FIRE_VERSION="1.5"
+FIRE_VERSION="2.0"
 
 set -e
 
@@ -36,15 +36,15 @@ MODULES_DIR="$DLKM_RAMDISK_DIR/lib/modules"
 MKBOOTIMG="$(pwd)/kernel_build/mkbootimg/mkbootimg.py"
 MKDTBOIMG="$(pwd)/kernel_build/dtb/mkdtboimg.py"
 
-OUT_KERNELZIP="$(pwd)/kernel_build/FireAsf-${FIRE_VERSION}-Testing223_a53x.zip"
-OUT_KERNELTAR="$(pwd)/kernel_build/FireAsf-${FIRE_VERSION}-Testing223_a53x.tar"
+OUT_KERNELZIP="$(pwd)/kernel_build/FireAsf-${FIRE_VERSION}-Stable_a53x.zip"
+OUT_KERNELTAR="$(pwd)/kernel_build/FireAsf-${FIRE_VERSION}-Stable_a53x.tar"
 OUT_KERNEL="$OUTDIR/arch/arm64/boot/Image"
 OUT_BOOTIMG="$(pwd)/kernel_build/zip/boot.img"
 OUT_VENDORBOOTIMG="$(pwd)/kernel_build/zip/vendor_boot.img"
 OUT_DTBIMAGE="$TMPDIR/dtb.img"
 
 # Kernel-side
-BUILD_ARGS="LOCALVERSION=-FireAsf-${FIRE_VERSION}-Testing KBUILD_BUILD_USER=Ksawlii KBUILD_BUILD_HOST=FireAsFuck"
+BUILD_ARGS="LOCALVERSION=-FireAsf-${FIRE_VERSION}-Stable KBUILD_BUILD_USER=Ksawlii KBUILD_BUILD_HOST=FireAsFuck"
 
 kfinish() {
     rm -rf "$TMPDIR"
