@@ -17,8 +17,8 @@ command_three() {
 while true; do
     echo ""
     echo "Choose what to do:"
-    echo "1: Build FireAsf kernel with Debug Logs"
-    echo "2: Build FireAsf kernel without Debug Logs"
+    echo "1: Build FireAsf kernel without KernelSU"
+    echo "2: Build FireAsf kernel with KernelSU"
     echo "Type 'exit' to guess what? Exit, yeah exit!"
     read -p "Make a good choice: " choice
 
