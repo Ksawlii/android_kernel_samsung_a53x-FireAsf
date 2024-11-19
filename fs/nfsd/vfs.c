@@ -1809,6 +1809,7 @@ retry:
 			if (!nfsd_wait_for_delegreturn(rqstp, d_inode(odentry)))
 				break;
 		}
+		host_err = vfs_rename(fdir, odentry, tdir, ndentry, NULL, 0);
 		if (!host_err) {
 			host_err = commit_metadata(tfhp);
 			if (!host_err)
