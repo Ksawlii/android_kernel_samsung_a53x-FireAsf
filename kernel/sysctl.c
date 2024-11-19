@@ -2820,16 +2820,6 @@ static struct ctl_table kern_table[] = {
 	{ }
 };
 
-static int proc_swappiness_handler(struct ctl_table *table, int write,
-				   void __user *buffer, size_t *lenp,
-				   loff_t *ppos)
-{
-	if (task_is_booster(current))
-		return 0;
-
-	return proc_dointvec_minmax(table, write, buffer, lenp, ppos);
-}
-
 static struct ctl_table vm_table[] = {
 	{
 		.procname	= "overcommit_memory",
@@ -2931,7 +2921,7 @@ static struct ctl_table vm_table[] = {
 		.data		= &dirty_expire_interval,
 		.maxlen		= sizeof(dirty_expire_interval),
 		.mode		= 0644,
-		.proc_handler	= proc_swappiness_handler,
+		.proc_handler	= proc_dointvec_minmax,
 		.extra1		= SYSCTL_ZERO,
 	},
 	{
@@ -2947,7 +2937,7 @@ static struct ctl_table vm_table[] = {
 		.data		= &vm_swappiness,
 		.maxlen		= sizeof(vm_swappiness),
 		.mode		= 0644,
-		.proc_handler	= proc_swappiness_handler,
+		.proc_handler	= proc_dointvec_minmax,
 		.extra1		= SYSCTL_ZERO,
 		.extra2		= SYSCTL_TWO_HUNDRED,
 	},
