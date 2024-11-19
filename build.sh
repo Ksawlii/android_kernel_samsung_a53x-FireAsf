@@ -1,12 +1,13 @@
 #!/bin/bash
 
 command_one() {
-    echo "Building with Debug Logs..."
+    echo "Building without KernelSU..."
     ./kernel_build/build.sh "$(pwd)" || exit 1
 }
 
 command_two() {
-    echo "Disabled temporary"
+    echo "Building with KernelSU..."
+    ./kernel_build/build-ksu.sh "$(pwd)" || exit 1
 }
 
 command_three() {
@@ -38,4 +39,3 @@ while true; do
             ;;
     esac
 done
-
