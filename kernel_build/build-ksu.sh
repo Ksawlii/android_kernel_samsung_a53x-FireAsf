@@ -1,7 +1,7 @@
 #!/bin/bash
 echo -e ""
 echo -e "If you have some errors when trying to rebuild, delete ./out dir"
-FIRE_VERSION="2.0"
+FIRE_VERSION="2.5"
 
 set -e
 
