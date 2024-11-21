@@ -74,9 +74,12 @@ if [ ! -d "$PARENT_DIR/build-tools" ]; then
     git clone https://android.googlesource.com/platform/prebuilts/build-tools "$PARENT_DIR/build-tools" --depth=1
 fi
 
-make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x_defconfig >/dev/null
-make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS dtbs >/dev/null
-make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS >/dev/null
+echo -e "\tCompiling kernel..."
+{ make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x_defconfig >/dev/null || { echo 'Error during kernel compilation'; exit 1; }; }
+echo -e "\tCompiling kernel..."
+{ make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS dtbs >/dev/null || { echo 'Error during kernel compilation'; exit 1; }; }
+echo -e "\tCompiling kernel..."
+{ make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS >/dev/null || { echo 'Error during kernel compilation'; exit 1; }; }
 make -j$(nproc --all) -C $(pwd) O=out INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" INSTALL_MOD_PATH="$MODULES_OUTDIR" modules_install >/dev/null
 
 rm -rf "$TMPDIR"
