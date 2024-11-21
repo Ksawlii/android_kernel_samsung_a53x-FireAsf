@@ -1,7 +1,7 @@
 #!/bin/bash
 echo -e ""
 echo -e "If you have some errors when trying to rebuild, delete ./out dir"
-FIRE_VERSION="2.0"
+FIRE_VERSION="2.5"
 
 set -e
 
@@ -74,10 +74,10 @@ if [ ! -d "$PARENT_DIR/build-tools" ]; then
     git clone https://android.googlesource.com/platform/prebuilts/build-tools "$PARENT_DIR/build-tools" --depth=1
 fi
 
-make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x_defconfig >/dev/null
-make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS dtbs >/dev/null
-make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS >/dev/null
-make -j$(nproc --all) -C $(pwd) O=out INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" INSTALL_MOD_PATH="$MODULES_OUTDIR" modules_install >/dev/null
+  make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x_defconfig >/dev/null
+  make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS dtbs >/dev/null
+  make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS
+  make -j$(nproc --all) -C $(pwd) O=out INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" INSTALL_MOD_PATH="$MODULES_OUTDIR" modules_install
 
 rm -rf "$TMPDIR"
 rm -f "$OUT_BOOTIMG"
