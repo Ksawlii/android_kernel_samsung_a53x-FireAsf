@@ -260,7 +260,7 @@
 &fec {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_enet>;
-	phy-connection-type = "rgmii-id";
+	phy-mode = "rgmii";
 	phy-handle = <&ethphy>;
 
 	mdio {
