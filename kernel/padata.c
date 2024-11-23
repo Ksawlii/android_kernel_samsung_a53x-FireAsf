@@ -409,8 +409,7 @@ void padata_do_serial(struct padata_priv *padata)
 	/* Sort in ascending order of sequence number. */
 	list_for_each_prev(pos, &reorder->list) {
 		cur = list_entry(pos, struct padata_priv, list);
-		/* Compare by difference to consider integer wrap around */
-		if ((signed int)(cur->seq_nr - padata->seq_nr) < 0)
+		if (cur->seq_nr < padata->seq_nr)
 			break;
 	}
 	list_add(&padata->list, pos);
