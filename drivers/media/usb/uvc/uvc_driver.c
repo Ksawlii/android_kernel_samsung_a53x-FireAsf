@@ -948,26 +948,16 @@ static int uvc_parse_streaming(struct uvc_device *dev,
 		goto error;
 	}
 
-	/*
-	 * Allocate memory for the formats, the frames and the intervals,
-	 * plus any required padding to guarantee that everything has the
-	 * correct alignment.
-	 */
-	size = nformats * sizeof(*format);
-	size = ALIGN(size, __alignof__(*frame)) + nframes * sizeof(*frame);
-	size = ALIGN(size, __alignof__(*interval))
+	size = nformats * sizeof(*format) + nframes * sizeof(*frame)
 	     + nintervals * sizeof(*interval);
-
 	format = kzalloc(size, GFP_KERNEL);
-	if (!format) {
+	if (format == NULL) {
 		ret = -ENOMEM;
 		goto error;
 	}
 
-	frame = (void *)format + nformats * sizeof(*format);
-	frame = PTR_ALIGN(frame, __alignof__(*frame));
-	interval = (void *)frame + nframes * sizeof(*frame);
-	interval = PTR_ALIGN(interval, __alignof__(*interval));
+	frame = (struct uvc_frame *)&format[nformats];
+	interval = (u32 *)&frame[nframes];
 
 	streaming->format = format;
 	streaming->nformats = nformats;
