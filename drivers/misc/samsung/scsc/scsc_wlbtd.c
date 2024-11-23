@@ -463,7 +463,7 @@ int scsc_wlbtd_get_and_print_build_type(void)
 	genlmsg_end(skb, msg);
 
 	SCSC_TAG_INFO(WLBTD, "finalize & send msg\n");
-	rc = genlmsg_multicast_allns(&scsc_nlfamily, skb, 0, 0, GFP_KERNEL);
+	rc = genlmsg_multicast_allns(&scsc_nlfamily, skb, 0, 0);
 
 	if (rc) {
 		SCSC_TAG_ERR(WLBTD, "failed to send message. rc = %d\n", rc);
@@ -542,7 +542,7 @@ int wlbtd_write_file(const char *file_path, const char *file_content)
 
 	SCSC_TAG_INFO(WLBTD, "finalize & send msg\n");
 	/* genlmsg_multicast_allns() frees skb */
-	rc = genlmsg_multicast_allns(&scsc_nlfamily, skb, 0, 0, GFP_KERNEL);
+	rc = genlmsg_multicast_allns(&scsc_nlfamily, skb, 0, 0);
 
 	if (rc) {
 		if (rc == -ESRCH) {
@@ -645,7 +645,7 @@ int chipset_logging_send_msg_to_netlink(const char *file_content, int length, u8
 
 	SCSC_TAG_DEBUG(WLBTD, "finalize & send msg\n");
 	/* genlmsg_multicast_allns() frees skb */
-	rc = genlmsg_multicast_allns(&scsc_nlfamily, skb, 0, 0, GFP_KERNEL);
+	rc = genlmsg_multicast_allns(&scsc_nlfamily, skb, 0, 0);
 
 	if (rc) {
 		if (rc == -EINVAL) {
@@ -813,7 +813,7 @@ int call_wlbtd_sable(u8 trigger_code, u16 reason_code)
 
 	SCSC_TAG_DEBUG(WLBTD, "finalize & send msg\n");
 	/* genlmsg_multicast_allns() frees skb */
-	rc = genlmsg_multicast_allns(&scsc_nlfamily, skb, 0, 0, GFP_KERNEL);
+	rc = genlmsg_multicast_allns(&scsc_nlfamily, skb, 0, 0);
 
 	if (rc) {
 		if (rc == -ESRCH) {
@@ -937,7 +937,7 @@ int call_wlbtd(const char *script_path)
 
 	SCSC_TAG_INFO(WLBTD, "finalize & send msg\n");
 	/* genlmsg_multicast_allns() frees skb */
-	rc = genlmsg_multicast_allns(&scsc_nlfamily, skb, 0, 0, GFP_KERNEL);
+	rc = genlmsg_multicast_allns(&scsc_nlfamily, skb, 0, 0);
 
 	if (rc) {
 		if (rc == -ESRCH) {
