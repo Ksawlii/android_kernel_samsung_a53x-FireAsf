@@ -94,10 +94,7 @@ struct msm_gpu {
 	struct msm_ringbuffer *rb[MSM_GPU_MAX_RINGS];
 	int nr_rings;
 
-	/*
-	 * List of GEM active objects on this gpu.  Protected by
-	 * msm_drm_private::mm_lock
-	 */
+	/* list of GEM active objects: */
 	struct list_head active_list;
 
 	/* does gpu need hw_init? */
