@@ -353,8 +353,8 @@ static int ipheth_close(struct net_device *net)
 {
 	struct ipheth_device *dev = netdev_priv(net);
 
-	netif_stop_queue(net);
 	cancel_delayed_work_sync(&dev->carrier_work);
+	netif_stop_queue(net);
 	return 0;
 }
 
