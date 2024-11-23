@@ -1,7 +1,7 @@
 #!/bin/bash
 echo -e ""
 echo -e "If you have some errors when trying to rebuild, delete ./out dir"
-FIRE_VERSION="2.0"
+FIRE_VERSION="3.0"
 
 set -e
 
@@ -36,8 +36,8 @@ MODULES_DIR="$DLKM_RAMDISK_DIR/lib/modules"
 MKBOOTIMG="$(pwd)/kernel_build/mkbootimg/mkbootimg.py"
 MKDTBOIMG="$(pwd)/kernel_build/dtb/mkdtboimg.py"
 
-OUT_KERNELZIP="$(pwd)/kernel_build/FireAsf-${FIRE_VERSION}-KSU-Unstable229-01_a53x.zip"
-OUT_KERNELTAR="$(pwd)/kernel_build/FireAsf-${FIRE_VERSION}-KSU-Unstable229-01_a53x.tar"
+OUT_KERNELZIP="$(pwd)/kernel_build/FireAsf-${FIRE_VERSION}-KSU-Unstable229-02_a53x.zip"
+OUT_KERNELTAR="$(pwd)/kernel_build/FireAsf-${FIRE_VERSION}-KSU-Unstable229-02_a53x.tar"
 OUT_KERNEL="$OUTDIR/arch/arm64/boot/Image"
 OUT_BOOTIMG="$(pwd)/kernel_build/zip/boot.img"
 OUT_VENDORBOOTIMG="$(pwd)/kernel_build/zip/vendor_boot.img"
