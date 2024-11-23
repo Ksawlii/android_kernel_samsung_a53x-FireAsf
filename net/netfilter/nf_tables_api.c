@@ -2968,13 +2968,13 @@ err_expr_parse:
 	return ERR_PTR(err);
 }
 
-int nft_expr_clone(struct nft_expr *dst, struct nft_expr *src, gfp_t gfp)
+int nft_expr_clone(struct nft_expr *dst, struct nft_expr *src)
 {
 	int err;
 
 	if (src->ops->clone) {
 		dst->ops = src->ops;
-		err = src->ops->clone(dst, src, gfp);
+		err = src->ops->clone(dst, src);
 		if (err < 0)
 			return err;
 	} else {
@@ -5524,7 +5524,7 @@ static int nft_set_elem_expr_setup(struct nft_ctx *ctx,
 	if (expr == NULL)
 		return 0;
 
-	err = nft_expr_clone(elem_expr, expr, GFP_KERNEL);
+	err = nft_expr_clone(elem_expr, expr);
 	if (err < 0)
 		return -ENOMEM;
 
@@ -5632,7 +5632,7 @@ static int nft_add_set_elem(struct nft_ctx *ctx, struct nft_set *set,
 		if (!expr)
 			return -ENOMEM;
 
-		err = nft_expr_clone(expr, set->expr, GFP_KERNEL);
+		err = nft_expr_clone(expr, set->expr);
 		if (err < 0)
 			goto err_set_elem_expr;
 	}
