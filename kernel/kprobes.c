@@ -1611,10 +1611,14 @@ static inline int check_kprobe_rereg(struct kprobe *p)
 
 int __weak arch_check_ftrace_location(struct kprobe *p)
 {
-	unsigned long addr = (unsigned long)p->addr;
+	unsigned long ftrace_addr;
 
-	if (ftrace_location(addr) == addr) {
+	ftrace_addr = ftrace_location((unsigned long)p->addr);
+	if (ftrace_addr) {
 #ifdef CONFIG_KPROBES_ON_FTRACE
+		/* Given address is not on the instruction boundary */
+		if ((unsigned long)p->addr != ftrace_addr)
+			return -EILSEQ;
 		p->flags |= KPROBE_FLAG_FTRACE;
 #else	/* !CONFIG_KPROBES_ON_FTRACE */
 		return -EINVAL;
