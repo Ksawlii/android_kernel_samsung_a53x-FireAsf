@@ -784,7 +784,8 @@ static int dove_pinctrl_probe(struct platform_device *pdev)
 	}
 	clk_prepare_enable(clk);
 
-	base = devm_platform_get_and_ioremap_resource(pdev, 0, &mpp_res);
+	mpp_res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+	base = devm_ioremap_resource(&pdev->dev, mpp_res);
 	if (IS_ERR(base))
 		return PTR_ERR(base);
 
