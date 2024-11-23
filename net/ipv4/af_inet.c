@@ -1473,18 +1473,19 @@ struct sk_buff *inet_gro_receive(struct list_head *head, struct sk_buff *skb)
 
 	proto = iph->protocol;
 
+	rcu_read_lock();
 	ops = rcu_dereference(inet_offloads[proto]);
 	if (!ops || !ops->callbacks.gro_receive)
-		goto out;
+		goto out_unlock;
 
 	if (*(u8 *)iph != 0x45)
-		goto out;
+		goto out_unlock;
 
 	if (ip_is_fragment(iph))
-		goto out;
+		goto out_unlock;
 
 	if (unlikely(ip_fast_csum((u8 *)iph, 5)))
-		goto out;
+		goto out_unlock;
 
 	id = ntohl(*(__be32 *)&iph->id);
 	flush = (u16)((ntohl(*(__be32 *)iph) ^ skb_gro_len(skb)) | (id & ~IP_DF));
@@ -1560,6 +1561,9 @@ struct sk_buff *inet_gro_receive(struct list_head *head, struct sk_buff *skb)
 
 	pp = indirect_call_gro_receive(tcp4_gro_receive, udp4_gro_receive,
 				       ops->callbacks.gro_receive, head, skb);
+
+out_unlock:
+	rcu_read_unlock();
 
 out:
 	skb_gro_flush_final(skb, pp, flush);
