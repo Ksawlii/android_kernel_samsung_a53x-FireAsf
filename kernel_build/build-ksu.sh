@@ -1,7 +1,7 @@
 #!/bin/bash
 echo -e ""
 echo -e "If you have some errors when trying to rebuild, delete ./out dir"
-FIRE_VERSION="2.0"
+FIRE_VERSION="3.0"
 
 set -e
 
@@ -44,7 +44,7 @@ OUT_VENDORBOOTIMG="$(pwd)/kernel_build/zip/vendor_boot.img"
 OUT_DTBIMAGE="$TMPDIR/dtb.img"
 
 # Kernel-side
-BUILD_ARGS="LOCALVERSION=-FireAsf-${FIRE_VERSION}-KSU-Stable KBUILD_BUILD_USER=Ksawlii KBUILD_BUILD_HOST=FireAsFuck"
+BUILD_ARGS="LOCALVERSION=-FireAsf-${FIRE_VERSION}-KSU-StableAsf KBUILD_BUILD_USER=Ksawlii KBUILD_BUILD_HOST=FireAsFuck"
 
 kfinish() {
     rm -rf "$TMPDIR"
