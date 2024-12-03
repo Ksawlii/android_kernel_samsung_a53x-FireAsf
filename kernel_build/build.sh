@@ -56,18 +56,18 @@ kfinish
 DIR="$(readlink -f .)"
 PARENT_DIR="$(readlink -f ${DIR}/..)"
 
-export CROSS_COMPILE="$PARENT_DIR/clang-r416183b/bin/aarch64-linux-gnu-"
-export CC="$PARENT_DIR/clang-r416183b/bin/clang"
+export CROSS_COMPILE="$PARENT_DIR/clang-r475365b/bin/aarch64-linux-gnu-"
+export CC="$PARENT_DIR/clang-r475365b/bin/clang"
 
 export PLATFORM_VERSION=12
 export ANDROID_MAJOR_VERSION=s
-export PATH="$PARENT_DIR/build-tools/path/linux-x86:$PARENT_DIR/clang-r416183b/bin:$PATH"
+export PATH="$PARENT_DIR/build-tools/path/linux-x86:$PARENT_DIR/clang-r475365b/bin:$PATH"
 export TARGET_SOC=s5e8825
 export LLVM=1 LLVM_IAS=1
 export ARCH=arm64
 
-if [ ! -d "$PARENT_DIR/clang-r416183b" ]; then
-    git clone https://github.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r416183b "$PARENT_DIR/clang-r416183b" --depth=1
+if [ ! -d "$PARENT_DIR/clang-r475365b" ]; then
+  git clone -j$(nproc --all) https://github.com/Ksawlii-Android-Repos/android_prebuilts_clang_host_linux-x86_clang-r475365b.git "$PARENT_DIR/clang-r475365b" --depth=1
 fi
 
 if [ ! -d "$PARENT_DIR/build-tools" ]; then

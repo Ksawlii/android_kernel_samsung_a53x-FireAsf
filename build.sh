@@ -11,6 +11,15 @@ command_two() {
 }
 
 command_three() {
+    rm -rf setup.sh*
+    rm -rf KernelSU*
+    wget https://raw.githubusercontent.com/nitanmarcel/KernelSU-susfs/refs/heads/main/kernel/setup.sh
+    chmod +x setup.sh
+    ./setup.sh*
+    rm -rf setup.sh
+}
+
+command_four() {
     echo "Exiting, really that quickly? :sob:"
 }
 
@@ -20,6 +29,7 @@ while true; do
     echo "Choose what to do:"
     echo "1: Build FireAsf kernel without KernelSU"
     echo "2: Build FireAsf kernel with KernelSU"
+    echo "3: Setup KernelSU Susfs (run before 2)"
     echo "Type 'exit' to guess what? Exit, yeah exit!"
     read -p "Make a good choice: " choice
 
@@ -29,6 +39,9 @@ while true; do
             ;;
         2)
             command_two
+            ;;
+        3)
+            command_three
             ;;
         exit)
             echo "Exiting the program. Goodbye!"
