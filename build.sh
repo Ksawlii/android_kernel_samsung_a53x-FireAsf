@@ -11,8 +11,12 @@ command_two() {
 }
 
 command_three() {
-    rm -rf KernelSU
-    curl -LSs "https://raw.githubusercontent.com/nitanmarcel/KernelSU-susfs/kernel/setup.sh" | bash -
+    rm -rf setup.sh*
+    rm -rf KernelSU*
+    wget https://raw.githubusercontent.com/nitanmarcel/KernelSU-susfs/refs/heads/main/kernel/setup.sh
+    chmod +x setup.sh
+    ./setup.sh*
+    rm -rf setup.sh
 }
 
 command_four() {
