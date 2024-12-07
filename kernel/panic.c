@@ -52,7 +52,7 @@ static unsigned int __read_mostly sysctl_oops_all_cpu_backtrace;
 #define sysctl_oops_all_cpu_backtrace 0
 #endif /* CONFIG_SMP */
 
-int panic_on_oops = CONFIG_PANIC_ON_OOPS_VALUE;
+int panic_on_oops = 0;
 static unsigned long tainted_mask =
 	IS_ENABLED(CONFIG_GCC_PLUGIN_RANDSTRUCT) ? (1 << TAINT_RANDSTRUCT) : 0;
 static int pause_on_oops;
@@ -64,8 +64,7 @@ unsigned long panic_on_taint;
 bool panic_on_taint_nousertaint = false;
 static unsigned int warn_limit __read_mostly;
 
-int panic_timeout = CONFIG_PANIC_TIMEOUT;
-EXPORT_SYMBOL_GPL(panic_timeout);
+int panic_timeout = 0;
 
 #define PANIC_PRINT_TASK_INFO		0x00000001
 #define PANIC_PRINT_MEM_INFO		0x00000002
