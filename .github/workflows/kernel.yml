@@ -8,14 +8,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Checkout
-      uses: actions/checkout@main
+      uses: https://git.yiffing.dev/Ksawlii/checkout@main
     - name: Clean
-      uses: https://github.com/rokibhasansagar/slimhub_actions@v23.44.6
+      uses: https://git.yiffing.dev/Ksawlii/slimhub_actions@main
     - name: Install tools
       run: |
         sudo apt-get update -y &>/dev/null || sudo apt-get update -y &>/dev/null || true
         sudo apt-get upgrade -y &>/dev/null || sudo apt-get upgrade -y &>/dev/null || true
-        sudo apt-get install brotli zip zstd tar lz4 cpio xz-utils -y || sudo apt-get install brotli zip zstd tar lz4 cpio xz-utils -y
+        sudo apt-get install flex bison brotli zip zstd tar lz4 cpio xz-utils -y || sudo apt-get install brotli zip zstd tar lz4 cpio xz-utils -y
     - name: Build
       run: |
           rm -rf setup.sh*
@@ -29,7 +29,7 @@ jobs:
           echo "Building with KernelSU..."
           ./kernel_build/build-ksu.sh "$(pwd)" || exit 1
     - name: Upload
-      uses: https://github.com/echapmanFromBunnings/upload-artifact@3.0.0
+      uses: https://git.yiffing.dev/Ksawlii/upload-artifact@main
       with:
         name: Kernels_a53x
         path: kernel_build/FireAsf*
