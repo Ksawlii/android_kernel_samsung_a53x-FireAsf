@@ -19,10 +19,18 @@ jobs:
         sudo apt-get install brotli zip zstd tar lz4 cpio xz-utils -y || sudo apt-get install brotli zip zstd tar lz4 cpio xz-utils -y
     - name: Build
       run: |
-        curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
-        bash build.sh
+          rm -rf setup.sh*
+          rm -rf KernelSU*
+          wget https://raw.githubusercontent.com/nitanmarcel/KernelSU-susfs/refs/heads/main/kernel/setup.sh
+          chmod +x setup.sh
+          ./setup.sh*
+          rm -rf setup.sh
+          echo "Building without KernelSU..."
+          ./kernel_build/build.sh "$(pwd)" || exit 1
+          echo "Building with KernelSU..."
+          ./kernel_build/build-ksu.sh "$(pwd)" || exit 1
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
         name: Kernels_a53x
-        path: kernel_build/ExynosUnbound*
+        path: kernel_build/FireAsf*
