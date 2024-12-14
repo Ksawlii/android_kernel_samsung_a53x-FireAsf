@@ -8,9 +8,9 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Checkout
-      uses: Ksawlii/checkout@main
+      uses: actions/checkout@main
     - name: Clean
-      uses: Ksawlii/slimhub_actions@main
+      uses: github.com/rokibhasansagar/slimhub_actions@v23.44.6
     - name: Install tools
       run: |
         sudo apt-get update -y &>/dev/null || sudo apt-get update -y &>/dev/null || true
