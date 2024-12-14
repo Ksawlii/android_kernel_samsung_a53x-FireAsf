@@ -6,12 +6,11 @@ on:
 jobs:
   kb:
     runs-on: ubuntu-22.04
-
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: Ksawlii/checkout@main
     - name: Clean
-      uses: rokibhasansagar/slimhub_actions@main
+      uses: Ksawlii/slimhub_actions@main
     - name: Install tools
       run: |
         sudo apt-get update -y &>/dev/null || sudo apt-get update -y &>/dev/null || true
@@ -30,7 +29,7 @@ jobs:
           echo "Building with KernelSU..."
           ./kernel_build/build-ksu.sh "$(pwd)" || exit 1
     - name: Upload
-      uses: actions/upload-artifact@v4
+      uses: Ksawlii/upload-artifact@main
       with:
         name: Kernels_a53x
         path: kernel_build/FireAsf*
