@@ -1507,9 +1507,9 @@ static int sm5451_create_debugfs_entries(struct sm5451_charger *sm5451)
 		return -ENOENT;
 	}
 
-	ent = debugfs_create_x32("address", S_IFREG | S_IWUSR | S_IRUGO,
-	sm5451->debug_root, &(sm5451->debug_address));
-	if (!ent) {
+	debugfs_create_x32("address", S_IFREG | S_IWUSR | S_IRUGO,
+		sm5451->debug_root, &(sm5451->debug_address));
+	if (!sm5451->debug_address) {
 		dev_err(sm5451->dev, "%s: can't create address\n", __func__);
 		return -ENOENT;
 	}
