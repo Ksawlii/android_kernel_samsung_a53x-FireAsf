@@ -26,6 +26,9 @@ ANDROID_MAJOR_VERSION ?= s
 LLVM := 1
 LLVM_IAS := 1
 
+# Less warnings
+KCFLAGS="${KCFLAGS} -gdwarf-4"
+
 # Export them
 export ARCH
 export CROSS_COMPILE
