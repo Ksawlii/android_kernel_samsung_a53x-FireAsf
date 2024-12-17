@@ -59,7 +59,7 @@ static int slsi_printf_mutex_stats(char *buf, const size_t bufsz, const char *pr
 
 static ssize_t slsi_procfs_mutex_stats_read(struct file *file,  char __user *user_buf, size_t count, loff_t *ppos)
 {
-  static char temp_buffer[2608];
+  __attribute__((unused)) static char temp_buffer[2608];
 	char              buf[76 + (200 * CONFIG_SCSC_WLAN_MAX_INTERFACES)];
 	int               pos = 0;
 	int               i;
