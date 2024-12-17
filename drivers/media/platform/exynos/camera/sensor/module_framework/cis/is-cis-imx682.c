@@ -396,6 +396,7 @@ p_err:
 #if SENSOR_IMX682_WRITE_SENSOR_CAL
 int sensor_imx682_cis_QuadSensCal_write(struct v4l2_subdev *subdev)
 {
+  static char temp_buffer[3088];
 	int ret = 0;
 	struct is_cis *cis;
 	struct i2c_client *client = NULL;

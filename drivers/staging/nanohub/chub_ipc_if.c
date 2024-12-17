@@ -111,6 +111,7 @@ static inline void contexthub_notify_host(struct contexthub_ipc_info *chub)
 
 static void cipc_func_handle_irq(int evt, void *priv)
 {
+  static char temp_buffer[4176];
 	int err;
 	int dbg;
 	int lock;
