@@ -81,7 +81,7 @@ EXPORT_SYMBOL_GPL(sysctl_sched_features);
  * Limited because this is done with IRQs disabled.
  */
 #if !defined(CONFIG_ANDROID)
-const_debug unsigned int sysctl_sched_nr_migrate = NR_CPUS;
+const_debug unsigned int sysctl_sched_nr_migrate = 32;
 #else
 const_debug unsigned int sysctl_sched_nr_migrate = 32;
 #endif
