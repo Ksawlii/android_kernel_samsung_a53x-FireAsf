@@ -217,7 +217,7 @@ static void cpupm_debug(int cpu, int state, int mode_type, int action)
 	i = cpupm_debug_info_index;
 
 	cpupm_debug_info[i].cpu = cpu;
-	cpupm_debug_info[i].time = cpu_clock(cpu);
+	cpupm_debug_info[i].time = sched_clock(cpu);
 
 	if (state > 0) {
 		event = action ? C2_ENTER : C2_EXIT;
