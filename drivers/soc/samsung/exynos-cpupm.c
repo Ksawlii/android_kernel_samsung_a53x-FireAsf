@@ -902,7 +902,6 @@ static void enter_power_mode(int cpu, struct power_mode *mode, ktime_t now)
 		break;
 	}
 
-	cpupm_debug(cpu, -1, mode->type, 1);
 	dbg_snapshot_cpuidle(mode->name, 0, 0, DSS_FLAG_IN);
 	set_state_idle(mode);
 
@@ -920,7 +919,6 @@ exit_power_mode(int cpu, struct power_mode *mode, int cancel, ktime_t now)
 	 */
 	set_state_busy(mode);
 	dbg_snapshot_cpuidle(mode->name, 0, 0, DSS_FLAG_OUT);
-	cpupm_debug(cpu, -1, mode->type, 0);
 
 	switch (mode->type) {
 	case POWERMODE_TYPE_CLUSTER:
@@ -943,7 +941,6 @@ static void exynos_cpupm_enter(int cpu, ktime_t now)
 	int i;
 
 	spin_lock(&cpupm_lock);
-	cpupm_debug(cpu, 1, -1, 1);
 
 	pm = per_cpu_ptr(cpupm, cpu);
 
@@ -992,7 +989,6 @@ static void exynos_cpupm_exit(int cpu, int cancel, ktime_t now)
 	/* Configure PMUCAL to power up core */
 	cal_cpu_enable(cpu);
 
-	cpupm_debug(cpu, 1, -1, 0);
 	spin_unlock(&cpupm_lock);
 
 	exynos_cpupm_notify(C2_EXIT, cancel);
