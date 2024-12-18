@@ -166,10 +166,10 @@ int adv_tracer_ipc_send_data_polling_timeout(unsigned int id,
 	adv_tracer_interrupt_gen(channel->id);
 	spin_unlock(&channel->ch_lock);
 
-	timeout = local_clock() + tmout_ns;
-	now = local_clock();
+	timeout = ktime_get_ns() + tmout_ns;
+	now = ktime_get_ns();
 	do {
-		now = local_clock();
+		now = ktime_get_ns();
 		adv_tracer_ipc_read_buffer(&_cmd.buffer[0],
 				channel->buff_regs, 1);
 	} while (!_cmd.cmd_raw.response && (timeout > now));
