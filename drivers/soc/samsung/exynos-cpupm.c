@@ -193,6 +193,7 @@ static void do_nothing(void *unused) { }
 /******************************************************************************
  *                                  CPUPM Debug                               *
  ******************************************************************************/
+#ifdef CONFIG_EXYNOS_DEBUG_INFO
 #define DEBUG_INFO_BUF_SIZE 1000
 struct cpupm_debug_info {
 	int cpu;
@@ -239,6 +240,7 @@ static void cpupm_debug(int cpu, int state, int mode_type, int action)
 out:
 	cpupm_debug_info[i].event = event;
 }
+#endif
 
 /******************************************************************************
  *                                    Notifier                                *
