@@ -1379,7 +1379,7 @@ static void android_vh_cpu_idle_enter(void *data, int *state,
 
 	target_state = &drv->states[pm->entered_state];
 	dbg_snapshot_cpuidle(target_state->desc, 0, 0, DSS_FLAG_IN);
-	pm->entered_time = ns_to_ktime(local_clock());
+	pm->entered_time = ns_to_ktime(ktime_get_ns());
 
 	/* Only handle requests except C1 */
 	if (pm->entered_state > 0) {
@@ -1412,7 +1412,7 @@ static void android_vh_cpu_idle_exit(void *data, int state,
 		exynos_cpupm_exit(cpu, cancel, now);
 
 	target_state = &drv->states[pm->entered_state];
-	time_end = ns_to_ktime(local_clock());
+	time_end = ns_to_ktime(ktime_get_ns());
 	residency = (int)ktime_to_us(ktime_sub(time_end, time_start));
 	dbg_snapshot_cpuidle(target_state->desc, 0, residency, cancel ? state : DSS_FLAG_OUT);
 }
