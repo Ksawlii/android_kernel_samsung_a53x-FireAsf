@@ -21,9 +21,6 @@ clk-exynos-audss.ko
 pl330.ko
 samsung-dma.ko
 dss.ko
-debug-snapshot-debug-kinfo.ko
-debug-snapshot-sfrdump.ko
-debug-snapshot-qd.ko
 exynos-coresight.ko
 exynos-ecc-handler.ko
 hardlockup-watchdog.ko
@@ -252,8 +249,9 @@ sm5714-charger.ko
 pdic_notifier_module.ko
 abc.ko
 abc_hub.ko
-sm5451-charger.ko
 mfd_sm5714.ko
+sm5714-charger.ko
+sx938x.ko
 hall_ic.ko
 hall_ic_notifier.ko
 sx938x.ko

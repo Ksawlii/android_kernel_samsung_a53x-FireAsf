@@ -144,12 +144,16 @@ static inline struct rq *rq_of_rt_se(struct sched_rt_entity *rt_se)
 	return rt_rq->rq;
 }
 
+void unregister_rt_sched_group(struct task_group *tg)
+{
+	if (tg->rt_se)
+		destroy_rt_bandwidth(&tg->rt_bandwidth);
+
+}
+
 void free_rt_sched_group(struct task_group *tg)
 {
 	int i;
-
-	if (tg->rt_se)
-		destroy_rt_bandwidth(&tg->rt_bandwidth);
 
 	for_each_possible_cpu(i) {
 		if (tg->rt_rq)
@@ -256,6 +260,8 @@ static inline struct rt_rq *rt_rq_of_se(struct sched_rt_entity *rt_se)
 
 	return &rq->rt;
 }
+
+void unregister_rt_sched_group(struct task_group *tg) { }
 
 void free_rt_sched_group(struct task_group *tg) { }
 
@@ -1477,8 +1483,10 @@ static int find_lowest_rq(struct task_struct *task);
 /*
  * Return whether the task on the given cpu is currently non-preemptible
  * while handling a potentially long softint, or if the task is likely
- * to block preemptions soon because it is a ksoftirq thread that is
- * handling slow softints.
+ * to block preemptions soon because (a) it is a ksoftirq thread that is
+ * handling slow softints, (b) it is idle and therefore likely to start
+ * processing the irq's immediately, (c) the cpu is currently handling
+ * hard irq's and will soon move on to the softirq handler.
  */
 bool
 task_may_not_preempt(struct task_struct *task, int cpu)
@@ -1488,8 +1496,9 @@ task_may_not_preempt(struct task_struct *task, int cpu)
 
 	struct task_struct *cpu_ksoftirqd = per_cpu(ksoftirqd, cpu);
 	return ((softirqs & LONG_SOFTIRQ_MASK) &&
-		(task == cpu_ksoftirqd ||
-		 task_thread_info(task)->preempt_count & SOFTIRQ_MASK));
+		(task == cpu_ksoftirqd || is_idle_task(task) ||
+		 (task_thread_info(task)->preempt_count
+			& (HARDIRQ_MASK | SOFTIRQ_MASK))));
 }
 EXPORT_SYMBOL_GPL(task_may_not_preempt);
 #endif /* CONFIG_RT_SOFTINT_OPTIMIZATION */
@@ -1497,7 +1506,7 @@ EXPORT_SYMBOL_GPL(task_may_not_preempt);
 static int
 select_task_rq_rt(struct task_struct *p, int cpu, int sd_flag, int flags)
 {
-	struct task_struct *curr;
+	struct task_struct *curr, *tgt_task;
 	struct rq *rq;
 	struct rq *this_cpu_rq;
 	bool test;
@@ -1569,6 +1578,18 @@ select_task_rq_rt(struct task_struct *p, int cpu, int sd_flag, int flags)
 
 	if (test || !rt_task_fits_capacity(p, cpu)) {
 		int target = find_lowest_rq(p);
+
+
+		/*
+		 * Check once for losing a race with the other core's irq
+		 * handler. This does not happen frequently, but it can avoid
+		 * delaying the execution of the RT task in those cases.
+		 */
+		if (target != -1) {
+			tgt_task = READ_ONCE(cpu_rq(target)->curr);
+			if (task_may_not_preempt(tgt_task, target))
+				target = find_lowest_rq(p);
+		}
 
 		/*
 		 * Bail out if we were forcing a migration to find a better
@@ -2124,8 +2145,11 @@ static int rto_next_cpu(struct root_domain *rd)
 
 		rd->rto_cpu = cpu;
 
-		if (cpu < nr_cpu_ids)
+		if (cpu < nr_cpu_ids) {
+			if (!has_pushable_tasks(cpu_rq(cpu)))
+				continue;
 			return cpu;
+		}
 
 		rd->rto_cpu = -1;
 
@@ -2434,7 +2458,7 @@ prio_changed_rt(struct rq *rq, struct task_struct *p, int oldprio)
 	if (!task_on_rq_queued(p))
 		return;
 
-	if (rq->curr == p) {
+	if (task_current(rq, p)) {
 #ifdef CONFIG_SMP
 		/*
 		 * If our priority decreases while running, we

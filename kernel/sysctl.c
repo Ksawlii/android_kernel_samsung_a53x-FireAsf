@@ -142,6 +142,19 @@ static int minolduid;
 static int ngroups_max = NGROUPS_MAX;
 static const int cap_last_cap = CAP_LAST_CAP;
 
+#ifdef CONFIG_SCHED_BORE
+extern uint sched_bore;
+extern uint sched_burst_smoothness_long;
+extern uint sched_burst_smoothness_short;
+extern uint sched_burst_fork_atavistic;
+extern uint sched_burst_penalty_offset;
+extern uint sched_burst_penalty_scale;
+extern uint sched_burst_cache_lifetime;
+static int __maybe_unused three          = 3;
+static int __maybe_unused sixty_four     = 64;
+static int __maybe_unused maxval_12_bits = 4095;
+#endif // CONFIG_SCHED_BORE
+
 /*
  * This is needed for proc_doulongvec_minmax of sysctl_hung_task_timeout_secs
  * and hung_task_check_interval_secs
@@ -192,7 +205,6 @@ static enum sysctl_writes_mode sysctl_writes_strict = SYSCTL_WRITES_STRICT;
 int sysctl_legacy_va_layout;
 #endif
 
-#ifdef CONFIG_SCHED_DEBUG
 static int min_sched_granularity_ns = 100000;		/* 100 usecs */
 static int max_sched_granularity_ns = NSEC_PER_SEC;	/* 1 second */
 static int min_wakeup_granularity_ns;			/* 0 usecs */
@@ -201,7 +213,6 @@ static int max_wakeup_granularity_ns = NSEC_PER_SEC;	/* 1 second */
 static int min_sched_tunable_scaling = SCHED_TUNABLESCALING_NONE;
 static int max_sched_tunable_scaling = SCHED_TUNABLESCALING_END-1;
 #endif /* CONFIG_SMP */
-#endif /* CONFIG_SCHED_DEBUG */
 
 #ifdef CONFIG_COMPACTION
 static int min_extfrag_threshold;
@@ -1803,16 +1814,6 @@ static struct ctl_table kern_table[] = {
 		.mode		= 0644,
 		.proc_handler	= proc_dointvec,
 	},
-#ifdef CONFIG_SCHED_DEBUG
-	{
-		.procname	= "sched_min_granularity_ns",
-		.data		= &sysctl_sched_min_granularity,
-		.maxlen		= sizeof(unsigned int),
-		.mode		= 0644,
-		.proc_handler	= sched_proc_update_handler,
-		.extra1		= &min_sched_granularity_ns,
-		.extra2		= &max_sched_granularity_ns,
-	},
 	{
 		.procname	= "sched_latency_ns",
 		.data		= &sysctl_sched_latency,
@@ -1848,6 +1849,18 @@ static struct ctl_table kern_table[] = {
 		.mode		= 0644,
 		.proc_handler	= proc_dointvec,
 	},
+#endif
+#ifdef CONFIG_SCHED_DEBUG
+	{
+		.procname	= "sched_min_granularity_ns",
+		.data		= &sysctl_sched_min_granularity,
+		.maxlen		= sizeof(unsigned int),
+		.mode		= 0644,
+		.proc_handler	= sched_proc_update_handler,
+		.extra1		= &min_sched_granularity_ns,
+		.extra2		= &max_sched_granularity_ns,
+	},
+#ifdef CONFIG_SMP
 	{
 		.procname	= "sched_nr_migrate",
 		.data		= &sysctl_sched_nr_migrate,
@@ -2757,6 +2770,69 @@ static struct ctl_table kern_table[] = {
 		.extra2		= SYSCTL_ONE_THOUSAND,
 	},
 #endif
+#ifdef CONFIG_SCHED_BORE
+	{
+		.procname	= "sched_bore",
+		.data		= &sched_bore,
+		.maxlen		= sizeof(int),
+		.mode		= 0644,
+		.proc_handler = proc_douintvec_minmax,
+		.extra1		= SYSCTL_ONE,
+		.extra2		= SYSCTL_ONE,
+	},
+	{
+		.procname	= "sched_burst_smoothness_long",
+		.data		= &sched_burst_smoothness_long,
+		.maxlen		= sizeof(int),
+		.mode		= 0644,
+		.proc_handler = proc_douintvec_minmax,
+		.extra1		= SYSCTL_ZERO,
+		.extra2		= SYSCTL_ONE,
+	},
+	{
+		.procname	= "sched_burst_smoothness_short",
+		.data		= &sched_burst_smoothness_short,
+		.maxlen		= sizeof(int),
+		.mode		= 0644,
+		.proc_handler = proc_douintvec_minmax,
+		.extra1		= SYSCTL_ZERO,
+		.extra2		= SYSCTL_ONE,
+	},
+	{
+		.procname	= "sched_burst_fork_atavistic",
+		.data		= &sched_burst_fork_atavistic,
+		.maxlen		= sizeof(int),
+		.mode		= 0644,
+		.proc_handler = proc_douintvec_minmax,
+		.extra1		= SYSCTL_ZERO,
+		.extra2		= &three,
+	},
+	{
+		.procname	= "sched_burst_penalty_offset",
+		.data		= &sched_burst_penalty_offset,
+		.maxlen		= sizeof(int),
+		.mode		= 0644,
+		.proc_handler = proc_douintvec_minmax,
+		.extra1		= SYSCTL_ZERO,
+		.extra2		= &sixty_four,
+	},
+	{
+		.procname	= "sched_burst_penalty_scale",
+		.data		= &sched_burst_penalty_scale,
+		.maxlen		= sizeof(int),
+		.mode		= 0644,
+		.proc_handler = proc_douintvec_minmax,
+		.extra1		= SYSCTL_ZERO,
+		.extra2		= &maxval_12_bits,
+	},
+	{
+		.procname	= "sched_burst_cache_lifetime",
+		.data		= &sched_burst_cache_lifetime,
+		.maxlen		= sizeof(int),
+		.mode		= 0644,
+		.proc_handler = proc_douintvec,
+	},
+#endif // CONFIG_SCHED_BORE
 	{
 		.procname	= "panic_on_warn",
 		.data		= &panic_on_warn,

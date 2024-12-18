@@ -392,8 +392,6 @@ static void ehld_setup(void)
 	/* hardlockup_handler_notifier_list */
 	atomic_notifier_chain_register(&hardlockup_handler_notifier_list,
 					&ehld_hardlockup_handler_block);
-
-	ehld->sjtag_en = dbg_snapshot_get_sjtag_status();
 }
 
 static int ehld_init_dt_parse(struct device_node *np)

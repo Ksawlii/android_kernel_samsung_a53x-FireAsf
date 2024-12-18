@@ -2681,9 +2681,10 @@ bool is_vender_wdr_mode_on(void *cis_data)
 }
 EXPORT_SYMBOL_GPL(is_vender_wdr_mode_on);
 
+
 bool is_vender_aeb_mode_on(void *cis_data)
 {
-	return (((cis_shared_data *)cis_data)->is_data.sensor_hdr_mode == SENSOR_HDR_MODE_2AEB ? true : false);
+  return (((cis_shared_data *)cis_data)->is_data.sensor_hdr_mode == (enum camera2_sensor_hdr_mode)SENSOR_HDR_MODE_2AEB) ? true : false;	
 }
 EXPORT_SYMBOL_GPL(is_vender_aeb_mode_on);
 

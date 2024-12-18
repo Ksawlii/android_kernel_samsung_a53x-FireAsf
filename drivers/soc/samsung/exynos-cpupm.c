@@ -191,56 +191,6 @@ static struct delayed_work deferred_work;
 static void do_nothing(void *unused) { }
 
 /******************************************************************************
- *                                  CPUPM Debug                               *
- ******************************************************************************/
-#define DEBUG_INFO_BUF_SIZE 1000
-struct cpupm_debug_info {
-	int cpu;
-	u64 time;
-	int event;
-};
-
-static struct cpupm_debug_info *cpupm_debug_info;
-static int cpupm_debug_info_index;
-
-static void cpupm_debug(int cpu, int state, int mode_type, int action)
-{
-	int i, event = -1;
-
-	if (unlikely(!cpupm_debug_info))
-		return;
-
-	cpupm_debug_info_index++;
-	if (cpupm_debug_info_index >= DEBUG_INFO_BUF_SIZE)
-		cpupm_debug_info_index = 0;
-
-	i = cpupm_debug_info_index;
-
-	cpupm_debug_info[i].cpu = cpu;
-	cpupm_debug_info[i].time = cpu_clock(cpu);
-
-	if (state > 0) {
-		event = action ? C2_ENTER : C2_EXIT;
-		goto out;
-	}
-
-	switch (mode_type) {
-	case POWERMODE_TYPE_CLUSTER:
-		event = action ? CPD_ENTER : CPD_EXIT;
-		break;
-	case POWERMODE_TYPE_DSU:
-		event = action ? DSUPD_ENTER : DSUPD_EXIT;
-		break;
-	case POWERMODE_TYPE_SYSTEM:
-		event = action ? SICD_ENTER : SICD_EXIT;
-		break;
-	}
-
-out:
-	cpupm_debug_info[i].event = event;
-}
-
-/******************************************************************************
  *                                    Notifier                                *
  ******************************************************************************/
 static DEFINE_RWLOCK(notifier_lock);
@@ -952,7 +902,6 @@ static void enter_power_mode(int cpu, struct power_mode *mode, ktime_t now)
 		break;
 	}
 
-	cpupm_debug(cpu, -1, mode->type, 1);
 	dbg_snapshot_cpuidle(mode->name, 0, 0, DSS_FLAG_IN);
 	set_state_idle(mode);
 
@@ -970,7 +919,6 @@ exit_power_mode(int cpu, struct power_mode *mode, int cancel, ktime_t now)
 	 */
 	set_state_busy(mode);
 	dbg_snapshot_cpuidle(mode->name, 0, 0, DSS_FLAG_OUT);
-	cpupm_debug(cpu, -1, mode->type, 0);
 
 	switch (mode->type) {
 	case POWERMODE_TYPE_CLUSTER:
@@ -993,7 +941,6 @@ static void exynos_cpupm_enter(int cpu, ktime_t now)
 	int i;
 
 	spin_lock(&cpupm_lock);
-	cpupm_debug(cpu, 1, -1, 1);
 
 	pm = per_cpu_ptr(cpupm, cpu);
 
@@ -1042,7 +989,6 @@ static void exynos_cpupm_exit(int cpu, int cancel, ktime_t now)
 	/* Configure PMUCAL to power up core */
 	cal_cpu_enable(cpu);
 
-	cpupm_debug(cpu, 1, -1, 0);
 	spin_unlock(&cpupm_lock);
 
 	exynos_cpupm_notify(C2_EXIT, cancel);
@@ -1379,7 +1325,7 @@ static void android_vh_cpu_idle_enter(void *data, int *state,
 
 	target_state = &drv->states[pm->entered_state];
 	dbg_snapshot_cpuidle(target_state->desc, 0, 0, DSS_FLAG_IN);
-	pm->entered_time = ns_to_ktime(local_clock());
+	pm->entered_time = ns_to_ktime(ktime_get_ns());
 
 	/* Only handle requests except C1 */
 	if (pm->entered_state > 0) {
@@ -1412,7 +1358,7 @@ static void android_vh_cpu_idle_exit(void *data, int state,
 		exynos_cpupm_exit(cpu, cancel, now);
 
 	target_state = &drv->states[pm->entered_state];
-	time_end = ns_to_ktime(local_clock());
+	time_end = ns_to_ktime(ktime_get_ns());
 	residency = (int)ktime_to_us(ktime_sub(time_end, time_start));
 	dbg_snapshot_cpuidle(target_state->desc, 0, residency, cancel ? state : DSS_FLAG_OUT);
 }
@@ -1809,9 +1755,6 @@ static int exynos_cpupm_probe(struct platform_device *pdev)
 			NULL, cpuhp_cpupm_offline);
 
 	spin_lock_init(&cpupm_lock);
-
-	cpupm_debug_info = kzalloc(sizeof(struct cpupm_debug_info)
-				* DEBUG_INFO_BUF_SIZE, GFP_KERNEL);
 
 	register_vendor_hooks();
 

@@ -381,6 +381,31 @@ int fvmap_get_raw_voltage_table(unsigned int id)
 	return 0;
 }
 
+static void optimize_rate_volt_table(struct rate_volt_header *head, unsigned int num_of_lv) {
+	bool changed;
+	int i;
+
+	/* optimize voltages */
+	while (true) {
+		changed = false;
+
+		for (i = 1; i < num_of_lv; i++) {
+			/* switch voltages if higher frequency uses less */
+			if (head->table[i].volt > head->table[i-1].volt) {
+				int temp_volt = head->table[i-1].volt;
+
+				head->table[i-1].volt = head->table[i].volt;
+				head->table[i].volt = temp_volt;
+
+				changed = true;
+			}
+		}
+
+		if (!changed)
+			break;
+	}
+}
+
 static void fvmap_copy_from_sram(void __iomem *map_base, void __iomem *sram_base)
 {
 	volatile struct fvmap_header *fvmap_header, *header;
@@ -429,10 +454,14 @@ static void fvmap_copy_from_sram(void __iomem *map_base, void __iomem *sram_base
 #endif
 		old = sram_base + fvmap_header[i].o_ratevolt;
 		new = map_base + fvmap_header[i].o_ratevolt;
+		
+		optimize_rate_volt_table(old, fvmap_header[i].num_of_lv);
 
 		margin = init_margin_table[vclk->margin_id];
 		if (margin)
 			cal_dfs_set_volt_margin(i | ACPM_VCLK_TYPE, margin);
+
+		volt_offset_percent = -4;
 
 		if (volt_offset_percent) {
 			if ((volt_offset_percent < 100) && (volt_offset_percent > -100)) {

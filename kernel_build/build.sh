@@ -36,15 +36,15 @@ MODULES_DIR="$DLKM_RAMDISK_DIR/lib/modules"
 MKBOOTIMG="$(pwd)/kernel_build/mkbootimg/mkbootimg.py"
 MKDTBOIMG="$(pwd)/kernel_build/dtb/mkdtboimg.py"
 
-OUT_KERNELZIP="$(pwd)/kernel_build/FireAsf-${FIRE_VERSION}-Stable_a53x.zip"
-OUT_KERNELTAR="$(pwd)/kernel_build/FireAsf-${FIRE_VERSION}-Stable_a53x.tar"
+OUT_KERNELZIP="$(pwd)/kernel_build/FireAsf-${FIRE_VERSION}-Testing231_a53x.zip"
+OUT_KERNELTAR="$(pwd)/kernel_build/FireAsf-${FIRE_VERSION}-Testing231_a53x.tar"
 OUT_KERNEL="$OUTDIR/arch/arm64/boot/Image"
 OUT_BOOTIMG="$(pwd)/kernel_build/zip/boot.img"
 OUT_VENDORBOOTIMG="$(pwd)/kernel_build/zip/vendor_boot.img"
 OUT_DTBIMAGE="$TMPDIR/dtb.img"
 
 # Kernel-side
-BUILD_ARGS="LOCALVERSION=-FireAsf-${FIRE_VERSION}-StableAsf KBUILD_BUILD_USER=Ksawlii KBUILD_BUILD_HOST=FireAsFuck"
+BUILD_ARGS="LOCALVERSION=-FireAsf-${FIRE_VERSION}-TestingAsf KBUILD_BUILD_USER=Ksawlii KBUILD_BUILD_HOST=FireAsFuck"
 
 kfinish() {
     rm -rf "$TMPDIR"
@@ -56,18 +56,18 @@ kfinish
 DIR="$(readlink -f .)"
 PARENT_DIR="$(readlink -f ${DIR}/..)"
 
-export CROSS_COMPILE="$PARENT_DIR/clang-r475365b/bin/aarch64-linux-gnu-"
-export CC="$PARENT_DIR/clang-r475365b/bin/clang"
+export CROSS_COMPILE="$PARENT_DIR/clang-r536225/bin/aarch64-linux-gnu-"
+export CC="$PARENT_DIR/clang-r536225/bin/clang"
 
 export PLATFORM_VERSION=12
 export ANDROID_MAJOR_VERSION=s
-export PATH="$PARENT_DIR/build-tools/path/linux-x86:$PARENT_DIR/clang-r475365b/bin:$PATH"
+export PATH="$PARENT_DIR/build-tools/path/linux-x86:$PARENT_DIR/clang-r536225/bin:$PATH"
 export TARGET_SOC=s5e8825
 export LLVM=1 LLVM_IAS=1
 export ARCH=arm64
 
-if [ ! -d "$PARENT_DIR/clang-r475365b" ]; then
-  git clone -j$(nproc --all) https://github.com/Ksawlii-Android-Repos/android_prebuilts_clang_host_linux-x86_clang-r475365b.git "$PARENT_DIR/clang-r475365b" --depth=1
+if [ ! -d "$PARENT_DIR/clang-r536225" ]; then
+  git clone -j$(nproc --all) https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r536225.git -b 15.0 "$PARENT_DIR/clang-r536225" --depth=1
 fi
 
 if [ ! -d "$PARENT_DIR/build-tools" ]; then

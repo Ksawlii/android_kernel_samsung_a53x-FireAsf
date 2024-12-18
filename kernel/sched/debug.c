@@ -507,7 +507,7 @@ static void task_group_path(struct task_group *tg, char *path, int plen)
 static void
 print_task(struct seq_file *m, struct rq *rq, struct task_struct *p)
 {
-	if (rq->curr == p)
+	if (task_current(rq, p))
 		SEQ_printf(m, ">R");
 	else
 		SEQ_printf(m, " %c", task_state_to_char(p));
@@ -523,6 +523,9 @@ print_task(struct seq_file *m, struct rq *rq, struct task_struct *p)
 		SPLIT_NS(p->se.sum_exec_runtime),
 		SPLIT_NS(schedstat_val_or_zero(p->se.statistics.sum_sleep_runtime)));
 
+#ifdef CONFIG_SCHED_BORE
+	SEQ_printf(m, " %2d", p->se.burst_score);
+#endif // CONFIG_SCHED_BORE
 #ifdef CONFIG_NUMA_BALANCING
 	SEQ_printf(m, " %d %d", task_node(p), task_numa_group_id(p));
 #endif
