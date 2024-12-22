@@ -262,7 +262,6 @@ sb_wireless.ko
 sec-battery.ko
 shub.ko
 sensor_core.ko
-stm_ts.ko
 goodix_ts_berlin.ko
 pdic_sm5714.ko
 exynos-bts.ko
