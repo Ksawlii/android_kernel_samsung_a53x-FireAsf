@@ -13,10 +13,10 @@ command_two() {
 command_three() {
     rm -rf setup.sh*
     rm -rf KernelSU*
-    wget https://raw.githubusercontent.com/nitanmarcel/KernelSU-susfs/refs/heads/main/kernel/setup.sh
+    wget https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh
     chmod +x setup.sh
-    ./setup.sh*
-    rm -rf setup.sh
+    ./setup.sh next-susfs-a12-5.10
+    rm -rf setup.sh*
 }
 
 command_four() {
