@@ -16,6 +16,8 @@ static char *saved_boot_config;
 extern int susfs_spoof_cmdline_or_bootconfig(struct seq_file *m);
 #endif
 
+static int boot_config_proc_show(struct seq_file *m, void *v)
+{
 #ifdef KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG
 	if (saved_boot_config) {
 		if (!susfs_spoof_cmdline_or_bootconfig(m)) {
@@ -23,7 +25,7 @@ extern int susfs_spoof_cmdline_or_bootconfig(struct seq_file *m);
 		}
 	}
 #endif
-  if (saved_boot_config)
+	if (saved_boot_config)
 		seq_puts(m, saved_boot_config);
 	return 0;
 }
