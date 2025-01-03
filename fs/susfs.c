@@ -19,8 +19,6 @@
 #endif
 
 static spinlock_t susfs_spin_lock;
-#define MAGIC_MOUNT_WORKDIR "/debug_ramdisk/workdir"
-static const size_t strlen_debug_ramdisk_workdir = strlen(MAGIC_MOUNT_WORKDIR);
 
 extern bool susfs_is_current_ksu_domain(void);
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
@@ -42,16 +40,26 @@ static DEFINE_HASHTABLE(SUS_PATH_HLIST, 10);
 static int susfs_update_sus_path_inode(char *target_pathname) {
 	struct path p;
 	struct inode *inode = NULL;
+	const char *dev_type;
 
 	if (kern_path(target_pathname, LOOKUP_FOLLOW, &p)) {
 		SUSFS_LOGE("Failed opening file '%s'\n", target_pathname);
 		return 1;
 	}
 
-	// We don't allow path of which filesystem type is "tmpfs", because its inode->i_ino is starting from 1 again,
-	// which will cause wrong comparison in function susfs_sus_ino_for_filldir64()
-	if (strcmp(p.mnt->mnt_sb->s_type->name, "tmpfs") == 0) {
-		SUSFS_LOGE("target_pathname: '%s' cannot be added since its filesystem is 'tmpfs'\n", target_pathname);
+	// - We don't allow paths of which filesystem type is "tmpfs" or "fuse".
+	//   For tmpfs, because its starting inode->i_ino will begin with 1 again,
+	//   so it will cause wrong comparison in function susfs_sus_ino_for_filldir64()
+	//   For fuse, which is almost storage related, sus_path should not handle any paths of
+	//   which filesystem is "fuse" as well, since app can write to "fuse" and lookup files via
+	//   like binder / system API (you can see the uid is changed to 1000)/
+	// - so sus_path should be applied only on read-only filesystem like "erofs" or "f2fs", but not "tmpfs" or "fuse",
+	//   people may rely on HMA for /data isolation instead.
+	dev_type = p.mnt->mnt_sb->s_type->name;
+	if (!strcmp(dev_type, "tmpfs") ||
+		!strcmp(dev_type, "fuse")) {
+		SUSFS_LOGE("target_pathname: '%s' cannot be added since its filesystem type is '%s'\n",
+						target_pathname, dev_type);
 		path_put(&p);
 		return 1;
 	}
@@ -526,9 +534,11 @@ void susfs_auto_add_try_umount_for_bind_mount(struct path *path) {
 		goto out_free_pathname;
 	}
 
+#ifdef CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT
 	if (strstr(dpath, MAGIC_MOUNT_WORKDIR)) {
 		is_magic_mount_path = true;
 	}
+#endif
 
 	list_for_each_entry_safe(cursor, temp, &LH_TRY_UMOUNT_PATH, list) {
 		if (is_magic_mount_path && strstr(dpath, cursor->info.target_pathname)) {
@@ -545,11 +555,12 @@ void susfs_auto_add_try_umount_for_bind_mount(struct path *path) {
 		goto out_free_pathname;
 	}
 
+#ifdef CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT
 	if (is_magic_mount_path) {
-		strncpy(new_list->info.target_pathname, dpath + strlen_debug_ramdisk_workdir, SUSFS_MAX_LEN_PATHNAME-1);
-	} else {
-		strncpy(new_list->info.target_pathname, dpath, SUSFS_MAX_LEN_PATHNAME-1);
+		strncpy(new_list->info.target_pathname, dpath + strlen(MAGIC_MOUNT_WORKDIR), SUSFS_MAX_LEN_PATHNAME-1);
+		goto out_add_to_list;
 	}
+#endif
 
 	new_list->info.mnt_mode = TRY_UMOUNT_DETACH;
 
