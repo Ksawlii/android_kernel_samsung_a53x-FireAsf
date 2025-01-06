@@ -31,3 +31,7 @@ mv $OUTDIR/.config $(pwd)/arch/arm64/config/a53x_defconfig
 # KSU
 make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x-ksu_defconfig >/dev/null
 mv $OUTDIR/.config $(pwd)/arch/arm64/config/a53x-ksu_defconfig
+
+# Commit
+git add $(pwd)/arch/arm64/config/a53x_defconfig $(pwd)/arch/arm64/config/a53x-ksu_defconfig
+git commit -m "defconfigs: Regenerate with regenerate.sh" -m "regenerate.sh: Best work frfr"
