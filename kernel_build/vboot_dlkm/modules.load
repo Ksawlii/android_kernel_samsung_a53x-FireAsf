@@ -245,10 +245,10 @@ fingerprint.ko
 fingerprint_sysfs.ko
 usb_typec_manager.ko
 if_cb_manager.ko
-sm5714-charger.ko
 pdic_notifier_module.ko
 abc.ko
 abc_hub.ko
+sm5451-charger.ko
 mfd_sm5714.ko
 sm5714-charger.ko
 sx938x.ko
