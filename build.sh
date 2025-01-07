@@ -12,7 +12,7 @@ command_two() {
 
 command_three() {
   echo "Regenerating ig"
-  ./kernel_build/regenerate.sh "$(pwd)" | | exit 1
+  ./kernel_build/regenerate.sh "$(pwd)" || exit 1
 }
 
 # Main loop
