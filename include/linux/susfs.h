@@ -165,10 +165,10 @@ int susfs_spoof_uname(struct new_utsname* tmp);
 #ifdef CONFIG_KSU_SUSFS_ENABLE_LOG
 void susfs_set_log(bool enabled);
 #endif
-/* spoof_bootconfig */
-#ifdef CONFIG_KSU_SUSFS_SPOOF_BOOTCONFIG
-int susfs_set_bootconfig(char* __user user_fake_boot_config);
-int susfs_spoof_bootconfig(struct seq_file *m);
+/* spoof_cmdline_or_bootconfig */
+#ifdef CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG
+int susfs_set_cmdline_or_bootconfig(char* __user user_fake_boot_config);
+int susfs_spoof_cmdline_or_bootconfig(struct seq_file *m);
 #endif
 /* open_redirect */
 #ifdef CONFIG_KSU_SUSFS_OPEN_REDIRECT
