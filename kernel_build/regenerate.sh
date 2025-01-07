@@ -1,4 +1,18 @@
 #!/bin/bash
+set -e
+
+if [ -z "$1" ]; then
+    echo "Please exec from root directory"
+    exit 1
+fi
+cd "$1"
+
+if [ "$(uname -m)" != "x86_64" ]; then
+  echo "This script requires an x86_64 (64-bit) machine."
+  exit 1
+fi
+
+export PATH="$(pwd)/kernel_build/bin:$PATH"
 
 # Config
 OUTDIR="$(pwd)/out"

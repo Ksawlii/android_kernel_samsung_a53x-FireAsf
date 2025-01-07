@@ -10,12 +10,18 @@ command_two() {
     ./kernel_build/build-ksu.sh "$(pwd)" || exit 1
 }
 
+command_three() {
+  echo "Regenerating ig"
+  ./kernel_build/regenerate.sh "$(pwd)" | | exit 1
+}
+
 # Main loop
 while true; do
     echo ""
     echo "Choose what to do:"
     echo "1: Build FireAsf kernel without KernelSU"
     echo "2: Build FireAsf kernel with KernelSU Next"
+    echo "3: Regenerate defconfigs and commit"
     echo "Type 'exit' to guess what? Exit, yeah exit!"
     read -p "Make a good choice: " choice
 
@@ -25,6 +31,9 @@ while true; do
             ;;
         2)
             command_two
+            ;;
+        3)
+            command_three
             ;;
         exit)
             echo "Exiting the program. Goodbye!"
