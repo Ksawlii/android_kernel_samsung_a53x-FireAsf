@@ -24,6 +24,10 @@ if [ ! -d "$PARENT_DIR/build-tools" ]; then
     git clone https://android.googlesource.com/platform/prebuilts/build-tools "$PARENT_DIR/build-tools" --depth=1
 fi
 
+# Dirs
+DIR="$(readlink -f .)"
+PARENT_DIR="$(readlink -f ${DIR}/..)"
+
 # Non ksu
 make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x_defconfig >/dev/null
 mv $OUTDIR/.config $(pwd)/arch/arm64/config/a53x_defconfig
