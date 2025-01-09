@@ -6917,6 +6917,7 @@ CONFIG_SEC_VIBRATOR=m
 # CONFIG_SEC_DEBUG_COREDUMP is not set
 # CONFIG_SEC_DEBUG_SCHED_REPORT is not set
 # CONFIG_SEC_DEBUG_DISABLE_DPRT is not set
+CONFIG_SEC_SAMSUNG_DEBUG_ENABLE=n
 
 #
 # Enable Dropdump to logging dropped network packet
