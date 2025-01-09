@@ -5,7 +5,7 @@
  * Copyright (c) 2019 Samsung Electronics Co., Ltd
  *              http://www.samsung.com
  */
-
+#ifdef SEC_SAMSUNG_DEBUG_ENABLE
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/sched.h>
@@ -2154,3 +2154,4 @@ module_exit(secdbg_test_exit);
 
 MODULE_DESCRIPTION("Samsung Debug Test driver");
 MODULE_LICENSE("GPL v2");
+#endif

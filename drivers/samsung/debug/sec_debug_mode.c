@@ -6,7 +6,7 @@
  * Samsung TN debugging code
  *
  */
-
+#ifdef SEC_SAMSUNG_DEBUG_ENABLE
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/moduleparam.h>
@@ -58,3 +58,4 @@ module_exit(secdbg_mode_exit);
 
 MODULE_DESCRIPTION("Samsung Debug mode driver");
 MODULE_LICENSE("GPL v2");
+#endif

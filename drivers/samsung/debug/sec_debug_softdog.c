@@ -5,6 +5,7 @@
  *
  * Samsung debugging code
  */
+#ifdef SEC_SAMSUNG_DEBUG_ENABLE
 #include <linux/kernel.h>
 #include <linux/types.h>
 #include <linux/smp.h>

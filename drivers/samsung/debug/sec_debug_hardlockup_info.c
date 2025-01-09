@@ -5,6 +5,7 @@
  *
  * sec_debug_hardlockup_info.c
  */
+#ifdef SEC_DEBUG_SAMSUNG_ENABLE
 #include <linux/slab.h>
 #include <linux/module.h>
 #include <linux/sched/clock.h>
@@ -505,3 +506,4 @@ module_exit(secdbg_hardlockup_info_exit);
 
 MODULE_DESCRIPTION("Samsung Debug Watchdog debug driver");
 MODULE_LICENSE("GPL v2");
+#endif

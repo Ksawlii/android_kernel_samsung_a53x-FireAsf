@@ -8,7 +8,7 @@
  * Copyright (c) 2019 Samsung Electronics Co., Ltd
  *              http://www.samsung.com
  */
-
+#ifdef SEC_SAMSUNG_DEBUG_ENABLE
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/sched.h>
@@ -447,3 +447,4 @@ late_initcall(sec_debug_watcher_proc_init);
 
 MODULE_DESCRIPTION("Samsung Debug Watchpoint");
 MODULE_LICENSE("GPL v2");
+#endif

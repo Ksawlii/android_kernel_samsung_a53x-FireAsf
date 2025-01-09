@@ -5,6 +5,7 @@
  *
  * Samsung debugging code
  */
+#ifdef SEC_SAMSUNG_DEBUG_ENABLE
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <trace/hooks/sched.h>
@@ -33,3 +34,4 @@ int __init secdbg_atsl_init(void)
 
 MODULE_DESCRIPTION("Samsung Debug Atomic Sleep driver");
 MODULE_LICENSE("GPL v2");
+#endif

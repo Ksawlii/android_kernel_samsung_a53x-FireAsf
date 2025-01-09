@@ -4,6 +4,12 @@
 #               http://www.samsung.com/
 #
 # Licensed under GPLv2
+config SEC_SAMSUNG_DEBUG_ENABLE
+  tristate "Enables samsung debug drivers"
+  depends on SEC_DEBUG
+  default n
+  help
+    Enables Samsung debug drivers
 
 config SEC_DEBUG_BASE
 	tristate "Enable Samsung debug fundamentals"

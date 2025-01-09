@@ -3,7 +3,7 @@
  * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *      http://www.samsung.com
  */
-
+#ifdef SEC_SAMSUNG_DEBUG_ENABLE
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/sched.h>
@@ -232,3 +232,4 @@ subsys_initcall(secdbg_dtsk_init);
 
 MODULE_DESCRIPTION("Samsung Debug Dtask driver");
 MODULE_LICENSE("GPL v2");
+#endif

@@ -5,7 +5,7 @@
  *
  * Samsung debugging code
  */
-
+#ifdef SEC_SAMSUNG_DEBUG_ENABLE
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/stacktrace.h>
@@ -74,3 +74,4 @@ module_exit(secdbg_stra_exit);
 
 MODULE_DESCRIPTION("Samsung Debug Stacktrace driver");
 MODULE_LICENSE("GPL v2");
+#endif
