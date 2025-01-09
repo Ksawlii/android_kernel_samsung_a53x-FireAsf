@@ -5,7 +5,7 @@
  * Copyright (c) 2019 Samsung Electronics Co., Ltd
  *              http://www.samsung.com
  */
-#ifdef
+#ifdef SEC_SAMSUNG_DEBUG_ENABLE
 #include <linux/module.h>
 #include <linux/moduleparam.h>
 #include <linux/kernel.h>
