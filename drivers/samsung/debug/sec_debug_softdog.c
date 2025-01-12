@@ -107,4 +107,3 @@ EXPORT_SYMBOL_GPL(secdbg_softdog_show_info);
 
 MODULE_DESCRIPTION("Samsung Debug softdog info driver");
 MODULE_LICENSE("GPL v2");
-#endif
