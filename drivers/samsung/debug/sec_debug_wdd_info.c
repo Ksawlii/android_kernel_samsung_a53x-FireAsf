@@ -5,7 +5,7 @@
  *
  * sec_debug_wdd_info.c
  */
-#ifdef SEC_SAMSUNG_DEBUG_ENABLE
+
 #include <linux/module.h>
 #include <linux/sched/clock.h>
 #include <linux/rtc.h>
@@ -69,4 +69,3 @@ subsys_initcall_sync(secdbg_wdd_init);
 
 MODULE_DESCRIPTION("Samsung Debug Watchdog debug driver");
 MODULE_LICENSE("GPL v2");
-#endif

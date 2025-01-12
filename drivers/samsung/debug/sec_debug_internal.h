@@ -5,7 +5,7 @@
  * COPYRIGHT(C) 2020 Samsung Electronics Co., Ltd. All Right Reserved.
  *
  */
-#ifdef SEC_SAMSUNG_DEBUG_ENABLE
+
 #ifndef __SEC_DEBUG_INTERNAL_H__
 #define __SEC_DEBUG_INTERNAL_H__
 
@@ -560,4 +560,3 @@ static inline void register_coredump_hook_notes_size(int (*func)(void)) { }
 #endif
 
 #endif /* __SEC_DEBUG_INTERNAL_H__ */
-#endif

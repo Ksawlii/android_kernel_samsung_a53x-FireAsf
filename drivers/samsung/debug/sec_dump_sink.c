@@ -1,4 +1,3 @@
-#ifdef SEC_SAMSUNG_DEBUG_ENABLE
 #include <linux/proc_fs.h>
 #include <linux/sec_debug.h>
 #include <linux/moduleparam.h>
@@ -316,4 +315,3 @@ int sec_dump_sink_init(void)
 
 	return 0;
 }
-#endif

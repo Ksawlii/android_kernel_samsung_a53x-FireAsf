@@ -11,7 +11,7 @@
  *  option) any later version.
  *
  */
-#ifdef SEC_SAMSUNG_DEBUG_ENABLE
+
 #include <linux/sched.h>
 #include <linux/spinlock.h>
 #include <linux/rwsem.h>
@@ -99,5 +99,4 @@ DEFINE_MEMBER_TYPE(xarray_xa_head, xarray, xa_head);
 DEFINE_MEMBER_TYPE(xa_node_slots, xa_node, slots);
 #ifdef CONFIG_STACKPROTECTOR_PER_TASK
 DEFINE_MEMBER_TYPE(task_struct_stack_canary, task_struct, stack_canary);
-#endif
 #endif

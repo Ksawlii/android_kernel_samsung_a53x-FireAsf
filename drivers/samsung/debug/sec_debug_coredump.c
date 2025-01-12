@@ -5,7 +5,7 @@
  * Copyright (c) 2021 Samsung Electronics Co., Ltd
  *              http://www.samsung.com
  */
-#ifdef SEC_SAMSUNG_DEBUG_ENABLE
+
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/elf.h>
@@ -70,4 +70,3 @@ subsys_initcall_sync(sec_coredump_extra_init);
 
 MODULE_DESCRIPTION("Samsung Debug Coredump Extra");
 MODULE_LICENSE("GPL v2");
-#endif

@@ -5,7 +5,7 @@
  * Copyright (c) 2016 Samsung Electronics Co., Ltd
  *              http://www.samsung.com
  */
-#ifdef SEC_SAMSUNG_DEBUG_ENABLE
+
 #include <linux/kernel.h>
 #include <linux/types.h>
 #include <linux/file.h>
@@ -197,4 +197,3 @@ static int __init secdbg_comm_auto_comment_proc_init(void)
 	return 0;
 }
 late_initcall(secdbg_comm_auto_comment_proc_init);
-#endif

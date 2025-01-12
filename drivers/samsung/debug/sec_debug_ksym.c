@@ -5,7 +5,7 @@
  * Copyright (c) 2019 Samsung Electronics Co., Ltd
  *              http://www.samsung.com
  */
-#ifdef SEC_SAMSUNG_DEBUG_ENABLE
+
 #include <linux/of.h>
 #include <linux/of_fdt.h>
 #include <linux/libfdt.h>
@@ -109,4 +109,3 @@ void secdbg_ksym_set_kallsyms_info(struct sec_debug_ksyms *ksyms)
 
 	pr_crit("%s: end to fill ksym data\n", __func__);
 }
-#endif

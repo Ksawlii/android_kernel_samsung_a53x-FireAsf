@@ -5,7 +5,7 @@
  * Copyright (c) 2019 Samsung Electronics Co., Ltd
  *              http://www.samsung.com
  */
-#ifdef SEC_SAMSUNG_DEBUG_ENABLE
+
 #include <linux/module.h>
 #include <linux/moduleparam.h>
 #include <linux/kernel.h>
@@ -268,4 +268,3 @@ module_init(secdbg_hw_param_init);
 
 MODULE_DESCRIPTION("Samsung Debug HW Parameter driver");
 MODULE_LICENSE("GPL v2");
-#endif

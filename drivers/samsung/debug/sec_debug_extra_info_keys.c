@@ -6,7 +6,6 @@
  *      http://www.samsung.com
  */
 
-#ifdef SEC_SAMSUNG_DEBUG_ENABLE
 /* keys are grouped by size */
 static char key32[][MAX_ITEM_KEY_LEN] = {
 	"ID", "KTIME", "BIN", "RR",
@@ -76,4 +75,3 @@ static char mkeys[][MAX_ITEM_KEY_LEN] = {
 static char tkeys[][MAX_ITEM_KEY_LEN] = {
 	"ID", "RR", "REGS"
 };
-#endif

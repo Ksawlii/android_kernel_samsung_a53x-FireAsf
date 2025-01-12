@@ -5,7 +5,7 @@
  *
  * Samsung debugging code
  */
-#ifdef SEC_SAMSUNG_DEBUG_ENABLE
+
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/slab.h>
@@ -343,4 +343,3 @@ module_exit(secdbg_scin_exit);
 
 MODULE_DESCRIPTION("Samsung Debug Sched info driver");
 MODULE_LICENSE("GPL v2");
-#endif
