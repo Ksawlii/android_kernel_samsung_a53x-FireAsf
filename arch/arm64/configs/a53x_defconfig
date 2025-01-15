@@ -7154,7 +7154,7 @@ CONFIG_SUPPORT_USB_TYPEC_OPS=y
 #
 # KernelSU
 #
-# CONFIG_KSU is not set
+CONFIG_KSU=n
 # end of KernelSU
 # end of Device Drivers
 
