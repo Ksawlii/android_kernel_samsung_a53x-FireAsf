@@ -59,7 +59,7 @@ PARENT_DIR="$(readlink -f ${DIR}/..)"
 export CROSS_COMPILE="$PARENT_DIR/clang-r536225/bin/aarch64-linux-gnu-"
 export CC="$PARENT_DIR/clang-r536225/bin/clang"
 
-export PLATFORM_VERSION=12
+export PLATFORM_VERSION=15.0
 export ANDROID_MAJOR_VERSION=s
 export PATH="$PARENT_DIR/build-tools/path/linux-x86:$PARENT_DIR/clang-r536225/bin:$PATH"
 export TARGET_SOC=s5e8825
