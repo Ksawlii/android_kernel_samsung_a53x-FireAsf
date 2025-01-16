@@ -3,11 +3,13 @@
 command_one() {
     echo "Building without KernelSU Next..."
     ./kernel_build/build.sh "$(pwd)" || exit 1
+    exit 0
 }
 
 command_two() {
     echo "Building with KernelSU Next..."
     ./kernel_build/build-ksu.sh "$(pwd)" || exit 1
+    exit 0
 }
 
 command_three() {
@@ -19,6 +21,7 @@ command_three() {
 command_four() {
     echo "Regenerating defconfigs"
     ./kernel_build/regen.sh "$(pwd)" || exit 1
+    exit 0
 }
 
 # Main loop
