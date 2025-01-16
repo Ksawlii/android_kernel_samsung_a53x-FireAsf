@@ -17,7 +17,8 @@ command_three() {
 }
 
 command_four() {
-    echo "Exiting, really that quickly? :sob:"
+    echo "Regenerating defconfigs"
+    ./kernel_build/regen.sh "$(pwd)" || exit 1
 }
 
 # Main loop
@@ -27,6 +28,7 @@ while true; do
     echo "1: Build FireAsf kernel without KernelSU"
     echo "2: Build FireAsf kernel with KernelSU"
     echo "3: Setup KernelSU Next (run before 2)"
+    echo "4: Regenerate defconfigs"
     echo "Type 'exit' to guess what? Exit, yeah exit!"
     read -p "Make a good choice: " choice
 
@@ -39,6 +41,9 @@ while true; do
             ;;
         3)
             command_three
+            ;;
+        4)
+            command_four
             ;;
         exit)
             echo "Exiting the program. Goodbye!"
