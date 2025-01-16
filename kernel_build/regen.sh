@@ -60,6 +60,7 @@ fi
 # Non KSU
 make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x_defconfig >/dev/null
 cp -rfv out/.config arch/arm64/configs/a53x_defconfig
+sed -i 's/^# CONFIG_KSU is not set$/CONFIG_KSU=n/' arch/arm64/configs/a53x_defconfig
 
 # KSU
 make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x-ksu_defconfig >/dev/null
