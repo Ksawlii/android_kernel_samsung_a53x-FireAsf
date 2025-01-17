@@ -33,8 +33,13 @@ MODULES_DIR="$DLKM_RAMDISK_DIR/lib/modules"
 MKBOOTIMG="$(pwd)/kernel_build/mkbootimg/mkbootimg.py"
 MKDTBOIMG="$(pwd)/kernel_build/dtb/mkdtboimg.py"
 
-OUT_KERNELZIP="$(pwd)/kernel_build/FireAsf-${FIRE_VERSION}-KSU-Testing233_a53x.zip"
-OUT_KERNELTAR="$(pwd)/kernel_build/FireAsf-${FIRE_VERSION}-KSU-Testing233_a53x.tar"
+YEAR="date +%Y"
+MONTH="date +%m"
+DAY_MONTH="date +%e"
+HOUR="date +%I.%MPM"
+
+OUT_KERNELZIP="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-KSU-Testing233-$HOUR_a53x.zip"
+OUT_KERNELTAR="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-KSU-Testing233-$HOUR_a53x.tar"
 OUT_KERNEL="$OUTDIR/arch/arm64/boot/Image"
 OUT_BOOTIMG="$(pwd)/kernel_build/zip/boot.img"
 OUT_VENDORBOOTIMG="$(pwd)/kernel_build/zip/vendor_boot.img"
@@ -161,6 +166,7 @@ cd "$DIR"
 
 
 echo "Building a flashable zip file (Recovery)..."
+mkdir -p "$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR"
 cd "$(pwd)/kernel_build/zip"
 rm -f "$OUT_KERNELZIP"
 brotli --quality=11 -c boot.img > boot.br
