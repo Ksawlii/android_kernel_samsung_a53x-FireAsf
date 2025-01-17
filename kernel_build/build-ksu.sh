@@ -36,7 +36,7 @@ MKDTBOIMG="$(pwd)/kernel_build/dtb/mkdtboimg.py"
 DAY_MONTH=$(date +%e | tr -d ' ') # Removes leading space for single-digit days
 MONTH=$(date +%m)
 YEAR=$(date +%Y)
-HOUR=$(date +%H) # Current hour in 24-hour format
+HOUR=$(date +%H.%M) # Current hour in 24-hour format
 
 OUT_KERNELZIP="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-KSU-Testing233-${HOUR}.zip"
 OUT_KERNELTAR="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-KSU-Testing233-${HOUR}.tar"
