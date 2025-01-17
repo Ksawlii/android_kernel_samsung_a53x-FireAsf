@@ -73,7 +73,7 @@ fi
 
 echo ""
 echo -e "Check in btop, htop, top (whatever you use) if its building.
-If you have some errors when trying to rebuild, delete $OUTDIR dir"
+If you have some errors when trying to rebuild, delete $OUTDIR"
 make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x-ksu_defconfig >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS dtbs >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS >/dev/null
