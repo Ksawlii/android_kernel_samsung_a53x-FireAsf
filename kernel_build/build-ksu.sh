@@ -33,13 +33,13 @@ MODULES_DIR="$DLKM_RAMDISK_DIR/lib/modules"
 MKBOOTIMG="$(pwd)/kernel_build/mkbootimg/mkbootimg.py"
 MKDTBOIMG="$(pwd)/kernel_build/dtb/mkdtboimg.py"
 
-YEAR="date +%Y"
-MONTH="date +%m"
-DAY_MONTH="date +%e"
-HOUR="date +%I.%MPM"
+DAY_MONTH=$(date +%e | tr -d ' ') # Removes leading space for single-digit days
+MONTH=$(date +%m)
+YEAR=$(date +%Y)
+HOUR=$(date +%H) # Current hour in 24-hour format
 
-OUT_KERNELZIP="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-KSU-Testing233-$HOUR_a53x.zip"
-OUT_KERNELTAR="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-KSU-Testing233-$HOUR_a53x.tar"
+OUT_KERNELZIP="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-KSU-Testing233-${HOUR}.zip"
+OUT_KERNELTAR="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-KSU-Testing233-${HOUR}.tar"
 OUT_KERNEL="$OUTDIR/arch/arm64/boot/Image"
 OUT_BOOTIMG="$(pwd)/kernel_build/zip/boot.img"
 OUT_VENDORBOOTIMG="$(pwd)/kernel_build/zip/vendor_boot.img"
@@ -79,7 +79,7 @@ fi
 echo ""
 echo -e "Check in btop, htop, top (whatever you use) if its building.
 If you have some errors when trying to rebuild, delete $OUTDIR"
-make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x-ksu_defconfig >/dev/null
+make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x-KSU_defconfig >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS dtbs >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" INSTALL_MOD_PATH="$MODULES_OUTDIR" modules_install >/dev/null
