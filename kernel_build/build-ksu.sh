@@ -71,6 +71,7 @@ if [ ! -d "$PARENT_DIR/build-tools" ]; then
     git clone https://android.googlesource.com/platform/prebuilts/build-tools "$PARENT_DIR/build-tools" --depth=1
 fi
 
+echo ""
 echo -e "Check in btop, htop, top (whatever you use) if its building.
 If you have some errors when trying to rebuild, delete $OUTDIR dir"
 make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x-ksu_defconfig >/dev/null
