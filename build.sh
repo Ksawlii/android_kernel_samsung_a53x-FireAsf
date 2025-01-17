@@ -24,6 +24,16 @@ command_four() {
     exit 0
 }
 
+command_five() {
+    OUTDIR="$(pwd)/out"
+    MODULES_OUTDIR="$(pwd)/modules_out"
+    TMPDIR="$(pwd)/kernel_build/tmp"
+    rm -rf "$TMPDIR"
+    rm -rf "$MODULES_OUTDIR"
+    rm -rf "$OUTDIR"
+    exit 0
+}
+
 # Main loop
 while true; do
     echo ""
@@ -32,6 +42,7 @@ while true; do
     echo "2: Build FireAsf kernel with KernelSU"
     echo "3: Setup KernelSU Next (run before 2)"
     echo "4: Regenerate defconfigs"
+    echo "5: Clean build dirs"
     echo "Type 'exit' to guess what? Exit, yeah exit!"
     read -p "Make a good choice: " choice
 
@@ -47,6 +58,9 @@ while true; do
             ;;
         4)
             command_four
+            ;;
+        5)
+            command_five
             ;;
         exit)
             echo "Exiting the program. Goodbye!"
