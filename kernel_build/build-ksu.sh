@@ -16,8 +16,6 @@ fi
 
 export PATH="$(pwd)/kernel_build/bin:$PATH"
 
-echo -e "Check in btop, htop, top (whatever you use) if its building.
-If you have some errors when trying to rebuild, delete ./out dir"
 # Configs
 OUTDIR="$(pwd)/out"
 MODULES_OUTDIR="$(pwd)/modules_out"
@@ -74,7 +72,7 @@ if [ ! -d "$PARENT_DIR/build-tools" ]; then
 fi
 
 echo -e "Check in btop, htop, top (whatever you use) if its building.
-If you have some errors when trying to rebuild, delete $OUTDIR (./out) dir"
+If you have some errors when trying to rebuild, delete $OUTDIR dir"
 make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x-ksu_defconfig >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS dtbs >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS >/dev/null
