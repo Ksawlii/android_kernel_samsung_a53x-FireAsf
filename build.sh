@@ -43,8 +43,8 @@ command_five() {
 while true; do
     echo ""
     echo "Choose what to do:"
-    echo "1: Build FireAsf kernel without KernelSU"
-    echo "2: Build FireAsf kernel with KernelSU"
+    echo "1: Build FireAsf kernel without KernelSU Next"
+    echo "2: Build FireAsf kernel with KernelSU Next"
     echo "3: Setup KernelSU Next (run before 2)"
     echo "4: Regenerate defconfigs"
     echo "5: Clean build dirs"
