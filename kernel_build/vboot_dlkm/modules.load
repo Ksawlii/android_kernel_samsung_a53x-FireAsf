@@ -250,6 +250,8 @@ pdic_notifier_module.ko
 abc.ko
 abc_hub.ko
 mfd_sm5714.ko
+mfd_s2mu106.ko
+hl7132_charger.ko
 sm5714-charger.ko
 sx938x.ko
 hall_ic.ko
