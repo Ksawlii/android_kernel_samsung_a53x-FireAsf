@@ -4053,6 +4053,13 @@
 			phandle = <0xb5>;
 		};
 
+		abox-dbg {
+			compatible = "exynos,abox_dbg";
+			size = <0x2900000>;
+			alloc-ranges = <0x00 0xc0000000 0x20000000>;
+			phandle = <0xbe>;
+		};
+
 		contexthub_rmem {
 			compatible = "samsung,exynos-contexthub";
 			size = <0x6a000>;
@@ -10486,6 +10493,7 @@
 		gnss_rmem = "/reserved-memory/gnss_rmem";
 		s2mpu_table = "/reserved-memory/s2mpu_table";
 		abox_rmem = "/reserved-memory/abox-rmem";
+		abox_dbg = "/reserved-memory/abox-dbg";
 		abox_slog = "/reserved-memory/abox-slog";
 		contexthub_rmem = "/reserved-memory/contexthub_rmem";
 		mfc_fw_rmem = "/reserved-memory/mfc_fw_rmem";
