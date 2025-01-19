@@ -280,7 +280,6 @@ snd-soc-samsung-vts.ko
 snd-soc-samsung-slif.ko
 exynos8825_audio.ko
 sec_audio_sysfs.ko
-sec_audio_debug.ko
 tcp_westwood.ko
 tcp_htcp.ko
 cfg80211.ko
