@@ -1,7 +1,5 @@
 #!/bin/bash
-echo -e ""
-echo -e "If you have some errors when trying to rebuild, delete ./out dir"
-FIRE_VERSION="4.0"
+FIRE_VERSION="5.0"
 
 set -e
 
@@ -18,7 +16,6 @@ fi
 
 export PATH="$(pwd)/kernel_build/bin:$PATH"
 
-echo -e "Check in btop, htop, top (whatever you use) if its building."
 # Configs
 OUTDIR="$(pwd)/out"
 MODULES_OUTDIR="$(pwd)/modules_out"
@@ -36,15 +33,20 @@ MODULES_DIR="$DLKM_RAMDISK_DIR/lib/modules"
 MKBOOTIMG="$(pwd)/kernel_build/mkbootimg/mkbootimg.py"
 MKDTBOIMG="$(pwd)/kernel_build/dtb/mkdtboimg.py"
 
-OUT_KERNELZIP="$(pwd)/kernel_build/FireAsf-${FIRE_VERSION}-KSU-Stable_a53x.zip"
-OUT_KERNELTAR="$(pwd)/kernel_build/FireAsf-${FIRE_VERSION}-KSU-Stable_a53x.tar"
+DAY_MONTH=$(date +%e | tr -d ' ') # Removes leading space for single-digit days
+MONTH=$(date +%m)
+YEAR=$(date +%Y)
+HOUR=$(date +%H.%M) # Current hour in 24-hour format
+
+OUT_KERNELZIP="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-KSU-Testing233-${HOUR}.zip"
+OUT_KERNELTAR="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-KSU-Testing233-${HOUR}.tar"
 OUT_KERNEL="$OUTDIR/arch/arm64/boot/Image"
 OUT_BOOTIMG="$(pwd)/kernel_build/zip/boot.img"
 OUT_VENDORBOOTIMG="$(pwd)/kernel_build/zip/vendor_boot.img"
 OUT_DTBIMAGE="$TMPDIR/dtb.img"
 
 # Kernel-side
-BUILD_ARGS="LOCALVERSION=-FireAsf-${FIRE_VERSION}-KSU-StableAsf KBUILD_BUILD_USER=Ksawlii KBUILD_BUILD_HOST=FireAsFuck"
+BUILD_ARGS="LOCALVERSION=-FireAsf-${FIRE_VERSION}-KSU-TestingFr KBUILD_BUILD_USER=Ksawlii KBUILD_BUILD_HOST=FireAsFuck"
 
 kfinish() {
     rm -rf "$TMPDIR"
@@ -59,7 +61,7 @@ PARENT_DIR="$(readlink -f ${DIR}/..)"
 export CROSS_COMPILE="$PARENT_DIR/clang-r536225/bin/aarch64-linux-gnu-"
 export CC="$PARENT_DIR/clang-r536225/bin/clang"
 
-export PLATFORM_VERSION=12
+export PLATFORM_VERSION=15.0
 export ANDROID_MAJOR_VERSION=s
 export PATH="$PARENT_DIR/build-tools/path/linux-x86:$PARENT_DIR/clang-r536225/bin:$PATH"
 export TARGET_SOC=s5e8825
@@ -74,6 +76,9 @@ if [ ! -d "$PARENT_DIR/build-tools" ]; then
     git clone https://android.googlesource.com/platform/prebuilts/build-tools "$PARENT_DIR/build-tools" --depth=1
 fi
 
+echo ""
+echo -e "Check in btop, htop, top (whatever you use) if its building.
+If you have some errors when trying to rebuild, delete $OUTDIR"
 make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x-ksu_defconfig >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS dtbs >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS >/dev/null
@@ -137,7 +142,6 @@ $MKBOOTIMG --header_version 4 \
     --os_version 12.0.0 \
     --os_patch_level 2024-09 || exit 1
 
-echo "Done!"
 echo "Building vendor_boot image..."
 
 cd "$DLKM_RAMDISK_DIR"
@@ -160,9 +164,9 @@ $MKBOOTIMG --header_version 4 \
 
 cd "$DIR"
 
-echo "Done!"
 
-echo "Building zip..."
+echo "Building a flashable zip file (Recovery)..."
+mkdir -p "$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR"
 cd "$(pwd)/kernel_build/zip"
 rm -f "$OUT_KERNELZIP"
 brotli --quality=11 -c boot.img > boot.br
@@ -172,7 +176,7 @@ rm -f boot.br vendor_boot.br
 cd "$DIR"
 echo "Done! Output: $OUT_KERNELZIP"
 
-echo "Building tar..."
+echo "Building a flashable tar file (Download Mode)..."
 cd "$(pwd)/kernel_build"
 rm -f "$OUT_KERNELTAR"
 lz4 -c -12 -B6 --content-size "$OUT_BOOTIMG" > boot.img.lz4

@@ -1893,8 +1893,8 @@ static int sm5714_fg_get_property(struct power_supply *psy,
 
 /*
  *	static int abnormal_current_cnt = 0;
- *	union power_supply_propval value;
  */
+	union power_supply_propval value;
 
 	if (atomic_read(&fuelgauge->shutdown_cnt) > 0) {
 		dev_info(fuelgauge->dev, "%s: fuelgauge already shutdown\n", __func__);
@@ -1940,6 +1940,8 @@ static int sm5714_fg_get_property(struct power_supply *psy,
 		case SEC_BATTERY_CAPACITY_CURRENT:
 			break;
 		case SEC_BATTERY_CAPACITY_AGEDCELL:
+			psy_do_property("battery", get, POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN, value);
+			val->intval = (sm5714_get_asoc(fuelgauge) * (value.intval/1000)) / 100;
 			break;
 		case SEC_BATTERY_CAPACITY_CYCLE:
 			sm5714_get_cycle(fuelgauge);
@@ -2103,8 +2105,8 @@ static int sm5714_fg_get_property(struct power_supply *psy,
 		val->intval = fuelgauge->capacity_max;
 		break;
 	case POWER_SUPPLY_PROP_CHARGE_COUNTER:
-		val->intval =
-			fuelgauge->battery_data->Capacity * fuelgauge->raw_capacity;
+		psy_do_property("battery", get, POWER_SUPPLY_PROP_CHARGE_FULL, value);
+		val->intval = value.intval/1000 * fuelgauge->raw_capacity; //uAh
 		pr_info("%s: charge_counter = %d\n", __func__, val->intval);
 		break;
 	case POWER_SUPPLY_PROP_CAPACITY_LEVEL:

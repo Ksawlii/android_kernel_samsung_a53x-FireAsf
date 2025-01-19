@@ -9,7 +9,6 @@ zsmalloc.ko
 lzo.ko
 lzo-rle.ko
 ssg.ko
-blk-sec-stats.ko
 phy-exynos-mipi-dsim.ko
 phy-exynos-mipi.ko
 phy-exynos-usbdrd-super.ko
@@ -249,9 +248,8 @@ sm5714-charger.ko
 pdic_notifier_module.ko
 abc.ko
 abc_hub.ko
+sm5451-charger.ko
 mfd_sm5714.ko
-sm5714-charger.ko
-sx938x.ko
 hall_ic.ko
 hall_ic_notifier.ko
 sx938x.ko

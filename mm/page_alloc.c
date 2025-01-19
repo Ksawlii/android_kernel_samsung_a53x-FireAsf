@@ -495,7 +495,12 @@ unsigned long __get_pfnblock_flags_mask(struct page *page,
 	word_bitidx = bitidx / BITS_PER_LONG;
 	bitidx &= (BITS_PER_LONG-1);
 
-	word = bitmap[word_bitidx];
+	/*
+	 * This races, without locks, with set_pfnblock_flags_mask(). Ensure
+	 * a consistent read of the memory array, so that results, even though
+	 * racy, are not corrupted.
+	 */
+	word = READ_ONCE(bitmap[word_bitidx]);
 	return (word >> bitidx) & mask;
 }
 
@@ -5072,10 +5077,12 @@ retry:
 		goto got_pg;
 
 	/* Avoid allocations with no watermarks from looping endlessly */
-	if (tsk_is_oom_victim(current) &&
-	    (alloc_flags & ALLOC_OOM ||
-	     (gfp_mask & __GFP_NOMEMALLOC)))
+  	if (tsk_is_oom_victim(current) &&
+	    (alloc_flags == ALLOC_OOM ||
+	     (gfp_mask & __GFP_NOMEMALLOC))) {
+		gfp_mask |= __GFP_NOWARN;
 		goto nopage;
+	}	
 
 	/* Retry as long as the OOM killer is making progress */
 	if (did_some_progress) {

@@ -1,0 +1,12 @@
+# Build files
+kernel_build/*.zip
+kernel_build/*.tar
+kernel_build/*.img.lz4
+kernel_build/FireAsf/*
+
+# From .patches
+*.rej
+*.orig
+
+# KernelSU-Next
+KernelSU-Next
