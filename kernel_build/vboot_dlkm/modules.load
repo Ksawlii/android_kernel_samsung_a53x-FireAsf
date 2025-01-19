@@ -214,7 +214,6 @@ nanohub.ko
 exynos_devfreq.ko
 s2mpu13_adc.ko
 npu.ko
-sec_pm_debug.ko
 sec_thermistor.ko
 sec_wakeup_cpu_allocator.ko
 sec_reboot.ko
@@ -281,7 +280,6 @@ snd-soc-samsung-vts.ko
 snd-soc-samsung-slif.ko
 exynos8825_audio.ko
 sec_audio_sysfs.ko
-sec_audio_debug.ko
 tcp_westwood.ko
 tcp_htcp.ko
 cfg80211.ko
