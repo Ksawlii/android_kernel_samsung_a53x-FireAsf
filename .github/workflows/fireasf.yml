@@ -1,0 +1,41 @@
+name: KBuild
+
+on:
+  workflow_dispatch:
+
+jobs:
+  kb:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout
+      uses: https://github.com/actions/checkout@v2
+    - name: Clean
+      uses: https://github.com/rokibhasansagar/slimhub_actions@main
+    - name: Install tools
+      run: |
+        sudo apt-get update -y &>/dev/null || sudo apt-get update -y &>/dev/null || true
+        sudo apt-get upgrade -y &>/dev/null || sudo apt-get upgrade -y &>/dev/null || true
+        sudo apt-get install brotli zip zstd tar lz4 cpio xz-utils -y || sudo apt-get install brotli zip zstd tar lz4 cpio xz-utils -y
+    - name: Get current date
+      id: date
+      run: |
+        echo "::set-output name=date::$(date +'%d.%m.%Y')"
+    - name: Build
+      run: |
+        rm -rf setup.sh*
+        rm -rf KernelSU*
+        curl -LSs "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh" | bash -s next
+        cp $(pwd)/patches/0001-KernelSU-Next-Implement-SUSFS-v1.5.3-plus-GKI.patch $(pwd)/KernelSU-Next/0001-KernelSU-Next-Implement-SUSFS-v1.5.3-plus-GKI.patch
+        cd $(pwd)/KernelSU-Next/
+        patch -p1 < 0001-KernelSU-Next-Implement-SUSFS-v1.5.3-plus-GKI.patch
+        cd ..
+        echo "Applied susfs4ksu"
+        ./kernel_build/build.sh "$(pwd)" || exit 1
+        ./kernel_build/build-ksu.sh "$(pwd)" || exit 1
+
+    - name: Upload
+      uses: https://github.com/actions/upload-artifact@v4
+      with:
+        name: Kernels_a53x
+        path: kernel_build/FireAsf/${{ steps.date.outputs.date }}/FireAsf*
