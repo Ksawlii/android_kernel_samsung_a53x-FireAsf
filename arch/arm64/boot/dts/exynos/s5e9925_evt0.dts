@@ -14,13 +14,6 @@
 		ranges;
 		phandle = <0x19a>;
 
-		abox-dbg {
-			compatible = "exynos,abox_dbg";
-			size = <0x2900000>;
-			alloc-ranges = <0x00 0xc0000000 0x20000000>;
-			phandle = <0xad>;
-		};
-
 		abox-slog {
 			compatible = "exynos,abox_slog";
 			size = <0x2800000>;
@@ -6068,13 +6061,6 @@
 			reg = <0x00 0x2139000 0x1000>;
 			reg-names = "reg";
 			phandle = <0x2c5>;
-		};
-
-		abox-debug@0 {
-			compatible = "samsung,abox-debug";
-			memory-region = <0xad 0xae>;
-			reg = <0x00 0x00 0x00>;
-			phandle = <0x2c6>;
 		};
 
 		abox-vss@0 {
@@ -15329,7 +15315,6 @@
 
 	__symbols__ {
 		reserved_memory = "/reserved-memory";
-		abox_dbg = "/reserved-memory/abox-dbg";
 		abox_slog = "/reserved-memory/abox-slog";
 		abox_rmem = "/reserved-memory/abox-rmem";
 		abox_rdma_compr = "/reserved-memory/abox-rdma-compr";
@@ -15866,7 +15851,6 @@
 		abox_udma_wr_dual_1 = "/abox@18c50000/abox-udma-wr-dual@18c5c880";
 		abox_udma_wr_debug_0 = "/abox@18c50000/abox-udma-wr-debug@18c5cd00";
 		abox_effect = "/abox@18c50000/abox-effect@2139000";
-		abox_debug = "/abox@18c50000/abox-debug@0";
 		abox_vss = "/abox@18c50000/abox-vss@0";
 		abox_tplg = "/abox@18c50000/abox-tplg@0";
 		abox_pci = "/abox@18c50000/abox-pci@0";
@@ -17158,10 +17142,6 @@
 
 			abox-dsif@18c50cf0 {
 				clocks = <0x00 0x08>;
-			};
-
-			abox-debug@0 {
-				memory-region = <0x00 0x04>;
 			};
 
 			abox-pci@0 {

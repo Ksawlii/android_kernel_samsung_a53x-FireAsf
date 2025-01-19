@@ -127,13 +127,6 @@
 			phandle = <0x17b>;
 		};
 
-		abox-dbg {
-			compatible = "exynos,abox_dbg";
-			size = <0x2900000>;
-			alloc-ranges = <0x00 0xc0000000 0x20000000>;
-			phandle = <0x15c>;
-		};
-
 		abox-slog {
 			compatible = "exynos,abox_slog";
 			reg = <0x08 0x9b800000 0x2800000>;
@@ -17140,13 +17133,6 @@
 			phandle = <0x32b>;
 		};
 
-		abox-debug@0 {
-			compatible = "samsung,abox-debug";
-			memory-region = <0x15c 0x15d>;
-			reg = <0x00 0x00 0x00>;
-			phandle = <0x32c>;
-		};
-
 		abox-vss@0 {
 			compatible = "samsung,abox-vss";
 			samsung,magic-offset = <0x700000>;
@@ -17674,7 +17660,6 @@
 		cp_rmem = "/reserved-memory/cp_rmem";
 		cp_rmem1 = "/reserved-memory/cp_rmem1";
 		dummy_heap = "/reserved-memory/dummy_heap";
-		abox_dbg = "/reserved-memory/abox-dbg";
 		abox_slog = "/reserved-memory/abox-slog";
 		abox_rmem = "/reserved-memory/abox-rmem";
 		abox_rdma_compr = "/reserved-memory/abox-rdma-compr";
@@ -18453,7 +18438,6 @@
 		abox_udma_wr_dual_1 = "/abox@18c50000/abox-udma-wr-dual@18c5c880";
 		abox_udma_wr_debug_0 = "/abox@18c50000/abox-udma-wr-debug@18c5cd00";
 		abox_effect = "/abox@18c50000/abox-effect@18e2e000";
-		abox_debug = "/abox@18c50000/abox-debug@0";
 		abox_vss = "/abox@18c50000/abox-vss@0";
 		abox_tplg = "/abox@18c50000/abox-tplg@0";
 		ext_bin_0 = "/abox@18c50000/ext-bin@0";
