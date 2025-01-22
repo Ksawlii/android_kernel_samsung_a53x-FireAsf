@@ -513,7 +513,7 @@ static int exynos_pd_probe(struct platform_device *pdev)
 		}
 	}
 
-#if defined(CONFIG_DEBUG_FS) && defined(CONFIG_CMUCAL_DEBUG)
+#ifdef CONFIG_DEBUG_FS
 	cal_register_pd_lookup_cmu_id(exynos_pd_lookup_cmu_id);
 #endif
 	dev_info(dev, EXYNOS_PD_PREFIX "PM Domain Initialize\n");
