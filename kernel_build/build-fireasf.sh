@@ -38,15 +38,24 @@ MONTH=$(date +%m)
 YEAR=$(date +%Y)
 HOUR=$(date +%H.%M) # Current hour in 24-hour format
 
-OUT_KERNELZIP="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-Testing233-${HOUR}.zip"
-OUT_KERNELTAR="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-Testing233-${HOUR}.tar"
+if [ "FIREASF_VANILLA" = "true" ]; then
+OUT_VANILLA_KERNELZIP="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-Vanilla-Testing233-${HOUR}.zip"
+OUT_VANILLA_KERNELTAR="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-Vanilla-Testing233-${HOUR}.tar"
+else
+OUT_KSUNEXT_KERNELZIP="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-KernelSU-Next-Testing233-${HOUR}.zip"
+OUT_KSUNEXT_KERNELTAR="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-KernelSU-Next-Testing233-${HOUR}.tar"
+fi
 OUT_KERNEL="$OUTDIR/arch/arm64/boot/Image"
 OUT_BOOTIMG="$(pwd)/kernel_build/zip/boot.img"
 OUT_VENDORBOOTIMG="$(pwd)/kernel_build/zip/vendor_boot.img"
 OUT_DTBIMAGE="$TMPDIR/dtb.img"
 
 # Kernel-side
-BUILD_ARGS="LOCALVERSION=-FireAsf-${FIRE_VERSION}-TestingFr KBUILD_BUILD_USER=Ksawlii KBUILD_BUILD_HOST=FireAsFuck"
+if [ "FIREASF_VANILLA" = "true" ]; then
+VANILLA_ARGS="LOCALVERSION=-FireAsf-${FIRE_VERSION}-Vanilla-TestingFr KBUILD_BUILD_USER=Ksawlii KBUILD_BUILD_HOST=FireAsFuck"
+else
+KSUNEXT_ARGS="LOCALVERSION=-FireAsf-${FIRE_VERSION}-KernelSU-Next-TestingFr KBUILD_BUILD_USER=Ksawlii KBUILD_BUILD_HOST=FireAsFuck"
+fi
 
 kfinish() {
     rm -rf "$TMPDIR"
@@ -79,9 +88,16 @@ fi
 echo ""
 echo -e "Check in btop, htop, top (whatever you use) if its building.
 If you have some errors when trying to rebuild, delete $OUTDIR"
-make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x_defconfig >/dev/null
-make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS dtbs >/dev/null
-make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS >/dev/null
+
+if [ "FIREASF_VANILLA" = "true" ]; then
+make -j$(nproc --all) -C $(pwd) O=out $VANILLA_VANILLA_ARGS a53x_defconfig >/dev/null
+make -j$(nproc --all) -C $(pwd) O=out $VANILLA_ARGS dtbs >/dev/null
+make -j$(nproc --all) -C $(pwd) O=out $VANILLA_ARGS >/dev/null
+else
+make -j$(nproc --all) -C $(pwd) O=out $KSUNEXT_ARGS a53x-ksu_defconfig >/dev/null
+make -j$(nproc --all) -C $(pwd) O=out $KSUNEXT_ARGS dtbs >/dev/null
+make -j$(nproc --all) -C $(pwd) O=out $KSUNEXT_ARGS >/dev/null
+fi
 make -j$(nproc --all) -C $(pwd) O=out INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" INSTALL_MOD_PATH="$MODULES_OUTDIR" modules_install >/dev/null
 
 rm -rf "$TMPDIR"
@@ -168,23 +184,47 @@ cd "$DIR"
 echo "Building a flashable zip file (Recovery)..."
 mkdir -p "$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR"
 cd "$(pwd)/kernel_build/zip"
-rm -f "$OUT_KERNELZIP"
+if [ "FIREASF_VANILLA" = "true" ]; then
+rm -f "$OUT_VANILLA_KERNELZIP"
+else
+rm -f "$OUT_KSUNEXT_KERNELZIP"
+fi
 brotli --quality=11 -c boot.img > boot.br
 brotli --quality=11 -c vendor_boot.img > vendor_boot.br
-zip -r9 -q "$OUT_KERNELZIP" META-INF boot.br vendor_boot.br
+if [ "FIREASF_VANILLA" = "true" ]; then
+zip -r9 -q "$OUT_VANILLA_KERNELZIP" META-INF boot.br vendor_boot.br
+else
+zip -r9 -q "$OUT_KSUNEXT_KERNELZIP" META-INF boot.br vendor_boot.br
+fi
 rm -f boot.br vendor_boot.br
 cd "$DIR"
-echo "Done! Output: $OUT_KERNELZIP"
+if [ "FIREASF_VANILLA" = "true" ]; then
+echo "Done! Output: $OUT_VANILLA_KERNELZIP"
+else
+echo "Done! Output: $OUT_KSUNEXT_KERNELZIP"
+fi
 
 echo "Building a flashable tar file (Download Mode)..."
 cd "$(pwd)/kernel_build"
-rm -f "$OUT_KERNELTAR"
+if [ "FIREASF_VANILLA" = "true" ]; then
+rm -f "$OUT_VANILLA_KERNELTAR"
+else
+rm -f "$OUT_KSUNEXT_KERNELTAR"
+fi
 lz4 -c -12 -B6 --content-size "$OUT_BOOTIMG" > boot.img.lz4
 lz4 -c -12 -B6 --content-size "$OUT_VENDORBOOTIMG" > vendor_boot.img.lz4
-tar -cf "$OUT_KERNELTAR" boot.img.lz4 vendor_boot.img.lz4
+if [ "FIREASF_VANILLA" = "true" ]; then
+tar -cf "$OUT_VANILLA_KERNELTAR" boot.img.lz4 vendor_boot.img.lz4
+else
+tar -cf "$OUT_KSUNEXT_KERNELTAR" boot.img.lz4 vendor_boot.img.lz4
+fi
 cd "$DIR"
 rm -f boot.img.lz4 vendor_boot.img.lz4
-echo "Done! Output: $OUT_KERNELTAR"
+if [ "FIREASF_VANILLA" = "true" ]; then
+echo "Done! Output: $OUT_VANILLA_KERNELTAR"
+else
+echo "Done! Output: $OUT_KSUNEXT_KERNELTAR"
+fi
 
 echo "Cleaning..."
 rm -f "${OUT_VENDORBOOTIMG}" "${OUT_BOOTIMG}"
