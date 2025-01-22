@@ -34,7 +34,6 @@ exynos-pd_el3.ko
 exynos-pd-dbg.ko
 cmupmucal.ko
 exynos_acpm.ko
-plugin_dbg.ko
 memlogger.ko
 sysevent.ko
 sysevent_notif.ko
