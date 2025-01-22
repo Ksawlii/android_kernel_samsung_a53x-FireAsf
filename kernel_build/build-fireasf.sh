@@ -90,7 +90,7 @@ echo -e "Check in btop, htop, top (whatever you use) if its building.
 If you have some errors when trying to rebuild, delete $OUTDIR"
 
 if [ "FIREASF_VANILLA" = "true" ]; then
-make -j$(nproc --all) -C $(pwd) O=out $VANILLA_VANILLA_ARGS a53x_defconfig >/dev/null
+make -j$(nproc --all) -C $(pwd) O=out $VANILLA_ARGS a53x_defconfig >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out $VANILLA_ARGS dtbs >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out $VANILLA_ARGS >/dev/null
 else
