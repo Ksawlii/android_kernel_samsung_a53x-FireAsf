@@ -26,12 +26,20 @@ command_three() {
 }
 
 command_four() {
+    if [ "$USE_CCACHE" = "1" ]; then
+      export USE_CCACHE=0
+    else
+      export USE_CCACHE=1
+    fi
+}
+
+command_five() {
     echo "Regenerating defconfigs"
     ./kernel_build/regen.sh "$(pwd)" || exit 1
     exit 0
 }
 
-command_five() {
+command_six() {
     OUTDIR="$(pwd)/out"
     MODULES_OUTDIR="$(pwd)/modules_out"
     TMPDIR="$(pwd)/kernel_build/tmp"
@@ -48,8 +56,13 @@ while true; do
     echo "1: Build FireAsf kernel without KernelSU Next"
     echo "2: Build FireAsf kernel with KernelSU Next"
     echo "3: Setup KernelSU Next (run before 2)"
-    echo "4: Regenerate defconfigs"
-    echo "5: Clean build dirs"
+    if [ "$USE_CCACHE" = "1" ]; then
+      echo "4: Disable ccache"
+    else
+      echo "4: Enable ccache"
+    fi
+    echo "5: Regenerate defconfigs"
+    echo "6: Clean build dirs"
     echo "Type 'exit' to guess what? Exit, yeah exit!"
     read -p "Make a good choice: " choice
 
@@ -68,6 +81,9 @@ while true; do
             ;;
         5)
             command_five
+            ;;
+        6)
+            command_six
             ;;
         exit)
             echo "Exiting the program. Goodbye!"

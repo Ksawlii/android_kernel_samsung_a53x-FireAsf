@@ -69,7 +69,11 @@ DIR="$(readlink -f .)"
 PARENT_DIR="$(readlink -f ${DIR}/..)"
 
 export CROSS_COMPILE="$PARENT_DIR/clang-r536225/bin/aarch64-linux-gnu-"
-export CC="$PARENT_DIR/clang-r536225/bin/clang"
+if [ "$USE_CCACHE" = "1" ]; then
+  export CC="$PARENT_DIR/clang-r536225/bin/clang ccache"
+else
+  export CC="$PARENT_DIR/clang-r536225/bin/clang"
+fi
 
 export PLATFORM_VERSION=15.0
 export ANDROID_MAJOR_VERSION=s
