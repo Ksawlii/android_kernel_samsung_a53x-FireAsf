@@ -31,8 +31,10 @@ jobs:
         patch -p1 < 0001-KernelSU-Next-Implement-SUSFS-v1.5.3-plus-GKI.patch
         cd ..
         echo "Applied susfs4ksu"
-        ./kernel_build/build.sh "$(pwd)" || exit 1
-        ./kernel_build/build-ksu.sh "$(pwd)" || exit 1
+        export FIREASF_VANILLA=true
+        ./kernel_build/build-fireasf.sh "$(pwd)" || exit 1
+        export FIREASF_VANILLA=false
+        ./kernel_build/build-fireasf.sh "$(pwd)" || exit 1
 
     - name: Upload
       uses: actions/upload-artifact@v4
