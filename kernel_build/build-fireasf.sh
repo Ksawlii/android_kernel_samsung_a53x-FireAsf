@@ -4,16 +4,20 @@ FIRE_VERSION="5.0"
 FIRE_VARIANT="Testing223"
 FIRE_MAINTAINER="Ksawlii"
 FIRE_KBUILD="KBUILD_BUILD_USER=${FIRE_MAINTAINER} KBUILD_BUILD_HOST=FireAsFuck"
+FIRE_DAY_MONTH=$(date +%e | tr -d ' ') # Removes leading space for single-digit days
+FIRE_MONTH=$(date +%m)
+FIRE_YEAR=$(date +%Y)
+FIRE_HOUR=$(date +%H.%M) # Current hour in 24-hour format
 if [ "FIREASF_VANILLA" = "true" ]; then
   FIRE_TYPE="Vanilla"
   FIRE_LOCALVERSION="LOCALVERSION=-FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}"
-  KERNELZIP="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}-${HOUR}.zip"
-  KERNELTAR="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}-${HOUR}.tar"
+  KERNELZIP="$(pwd)/kernel_build/FireAsf/$FIRE_DAY_MONTH.$FIRE_MONTH.$FIRE_YEAR/FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}-${FIRE_HOUR}.zip"
+  KERNELTAR="$(pwd)/kernel_build/FireAsf/$FIRE_DAY_MONTH.$FIRE_MONTH.$FIRE_YEAR/FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}-${FIRE_HOUR}.tar"
 else
   FIRE_TYPE="KernelSU-Next"
   FIRE_LOCALVERSION="LOCALVERSION=-FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}"
-  KERNELZIP="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}-${HOUR}.zip"
-  KERNELTAR="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}-${HOUR}.tar"
+  KERNELZIP="$(pwd)/kernel_build/FireAsf/$FIRE_DAY_MONTH.$FIRE_MONTH.$FIRE_YEAR/FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}-${FIRE_HOUR}.zip"
+  KERNELTAR="$(pwd)/kernel_build/FireAsf/$FIRE_DAY_MONTH.$FIRE_MONTH.$FIRE_YEAR/FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}-${FIRE_HOUR}.tar"
 fi
 
 set -e
@@ -47,11 +51,6 @@ MODULES_DIR="$DLKM_RAMDISK_DIR/lib/modules"
 
 MKBOOTIMG="$(pwd)/kernel_build/mkbootimg/mkbootimg.py"
 MKDTBOIMG="$(pwd)/kernel_build/dtb/mkdtboimg.py"
-
-DAY_MONTH=$(date +%e | tr -d ' ') # Removes leading space for single-digit days
-MONTH=$(date +%m)
-YEAR=$(date +%Y)
-HOUR=$(date +%H.%M) # Current hour in 24-hour format
 
 OUT_KERNEL="$OUTDIR/arch/arm64/boot/Image"
 OUT_BOOTIMG="$(pwd)/kernel_build/zip/boot.img"
@@ -182,7 +181,7 @@ cd "$DIR"
 
 
 echo "Building a flashable zip file (Recovery)..."
-mkdir -p "$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR"
+mkdir -p "$(pwd)/kernel_build/FireAsf/$FIRE_DAY_MONTH.$FIRE_MONTH.$FIRE_YEAR"
 cd "$(pwd)/kernel_build/zip"
 rm -f "$KERNELZIP"
 brotli --quality=11 -c boot.img > boot.br
