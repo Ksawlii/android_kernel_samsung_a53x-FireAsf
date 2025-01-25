@@ -39,9 +39,6 @@
 #include <linux/bitops.h>
 #include <linux/init_task.h>
 #include <linux/uaccess.h>
-#if defined(CONFIG_KSU_SUSFS_SUS_PATH) || defined(CONFIG_KSU_SUSFS_OPEN_REDIRECT)
-#include <linux/susfs_def.h>
-#endif
 
 #if defined(CONFIG_KSU_SUSFS_SUS_PATH) || defined(CONFIG_KSU_SUSFS_OPEN_REDIRECT)
 #include <linux/susfs_def.h>
@@ -1145,12 +1142,6 @@ int may_linkat(struct path *link)
 	}
 #endif
 
-#ifdef CONFIG_KSU_SUSFS_SUS_PATH
-	if (inode && unlikely(inode->i_state & INODE_STATE_SUS_PATH) && likely(current->susfs_task_state & TASK_STRUCT_NON_ROOT_USER_APP_PROC)) {
-		return -ENOENT;
-	}
-#endif
-
 	/* Inode writeback is not safe when the uid or gid are invalid. */
 	if (!uid_valid(inode->i_uid) || !gid_valid(inode->i_gid))
 		return -EOVERFLOW;
@@ -1570,19 +1561,6 @@ static struct dentry *lookup_dcache(const struct qstr *name,
 			return ERR_PTR(error);
 		}
 	}
-#ifdef CONFIG_KSU_SUSFS_SUS_PATH
-	if (!IS_ERR(dentry) && dentry->d_inode && unlikely(dentry->d_inode->i_state & INODE_STATE_SUS_PATH) && likely(current->susfs_task_state & TASK_STRUCT_NON_ROOT_USER_APP_PROC)) {
-		if ((flags & (LOOKUP_CREATE | LOOKUP_EXCL))) {
-			error = inode_permission(dir, MAY_WRITE | MAY_EXEC);
-			if (error) {
-				dput(dentry);
-				return ERR_PTR(error);
-			}
-		}
-		dput(dentry);
-		return ERR_PTR(-ENOENT);
-	}
-#endif
 	return dentry;
 }
 
@@ -1695,12 +1673,6 @@ static struct dentry *lookup_fast(struct nameidata *nd,
 		dput(dentry);
 		return ERR_PTR(status);
 	}
-#ifdef CONFIG_KSU_SUSFS_SUS_PATH
-	if (!IS_ERR(dentry) && dentry->d_inode && unlikely(dentry->d_inode->i_state & INODE_STATE_SUS_PATH) && likely(current->susfs_task_state & TASK_STRUCT_NON_ROOT_USER_APP_PROC)) {
-		dput(dentry);
-		return ERR_PTR(-ENOENT);
-	}
-#endif
 	return dentry;
 }
 
@@ -2498,12 +2470,6 @@ static const char *path_init(struct nameidata *nd, unsigned flags)
 			path_get(&nd->root);
 			nd->flags |= LOOKUP_ROOT_GRABBED;
 		}
-#ifdef CONFIG_KSU_SUSFS_SUS_PATH
-		// we deal with sus sub path here
-		if (nd->inode && unlikely(nd->inode->i_state & INODE_STATE_SUS_PATH) && likely(current->susfs_task_state & TASK_STRUCT_NON_ROOT_USER_APP_PROC)) {
-			return 0;
-		}
-#endif
 	}
 	return s;
 }
@@ -2921,12 +2887,6 @@ static int may_delete(struct inode *dir, struct dentry *victim, bool isdir)
 	}
 #endif
 
-#ifdef CONFIG_KSU_SUSFS_SUS_PATH
-	if (unlikely(inode->i_state & INODE_STATE_SUS_PATH) && likely(current->susfs_task_state & TASK_STRUCT_NON_ROOT_USER_APP_PROC)) {
-		return -ENOENT;
-	}
-#endif
-
 	if (check_sticky(dir, inode) || IS_APPEND(inode) ||
 	    IS_IMMUTABLE(inode) || IS_SWAPFILE(inode) || HAS_UNMAPPED_ID(inode))
 		return -EPERM;
@@ -3133,12 +3093,6 @@ static int may_open(const struct path *path, int acc_mode, int flag)
 
 	if (!inode)
 		return -ENOENT;
-
-#ifdef CONFIG_KSU_SUSFS_SUS_PATH
-	if (unlikely(inode->i_state & INODE_STATE_SUS_PATH) && likely(current->susfs_task_state & TASK_STRUCT_NON_ROOT_USER_APP_PROC)) {
-		return -ENOENT;
-	}
-#endif
 
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 	if (unlikely(inode->i_state & INODE_STATE_SUS_PATH) && likely(current->susfs_task_state & TASK_STRUCT_NON_ROOT_USER_APP_PROC)) {

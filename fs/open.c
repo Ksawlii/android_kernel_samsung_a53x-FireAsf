@@ -401,12 +401,6 @@ extern int ksu_handle_faccessat(int *dfd, const char __user **filename_user, int
 			int *flags);
 #endif
 
-#ifdef CONFIG_KSU_SUSFS_SUS_SU
-extern bool susfs_is_sus_su_hooks_enabled __read_mostly;
-extern int ksu_handle_faccessat(int *dfd, const char __user **filename_user, int *mode,
-			int *flags);
-#endif
-
 static long do_faccessat(int dfd, const char __user *filename, int mode, int flags)
 {
 	struct path path;
@@ -414,12 +408,6 @@ static long do_faccessat(int dfd, const char __user *filename, int mode, int fla
 	int res;
 	unsigned int lookup_flags = LOOKUP_FOLLOW;
 	const struct cred *old_cred = NULL;
-
-#ifdef CONFIG_KSU_SUSFS_SUS_SU
-	if (susfs_is_sus_su_hooks_enabled) {
-		ksu_handle_faccessat(&dfd, &filename, &mode, NULL);
-	}
-#endif
 
 #ifdef CONFIG_KSU_SUSFS_SUS_SU
 	if (susfs_is_sus_su_hooks_enabled) {
