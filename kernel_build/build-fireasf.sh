@@ -10,11 +10,13 @@ FIRE_YEAR=$(date +%Y)
 FIRE_HOUR=$(date +%H.%M) # Current hour in 24-hour format
 if [ "FIREASF_VANILLA" = "true" ]; then
   FIRE_TYPE="Vanilla"
+  FIRE_DEFCONFIG=a53x_defconfig
   FIRE_LOCALVERSION="LOCALVERSION=-FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}"
   KERNELZIP="$(pwd)/kernel_build/FireAsf/$FIRE_DAY_MONTH.$FIRE_MONTH.$FIRE_YEAR/FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}-${FIRE_HOUR}.zip"
   KERNELTAR="$(pwd)/kernel_build/FireAsf/$FIRE_DAY_MONTH.$FIRE_MONTH.$FIRE_YEAR/FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}-${FIRE_HOUR}.tar"
 else
   FIRE_TYPE="KN"
+  FIRE_DEFCONFIG=a53x-ksu_defconfig
   FIRE_LOCALVERSION="LOCALVERSION=-FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}"
   KERNELZIP="$(pwd)/kernel_build/FireAsf/$FIRE_DAY_MONTH.$FIRE_MONTH.$FIRE_YEAR/FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}-${FIRE_HOUR}.zip"
   KERNELTAR="$(pwd)/kernel_build/FireAsf/$FIRE_DAY_MONTH.$FIRE_MONTH.$FIRE_YEAR/FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}-${FIRE_HOUR}.tar"
@@ -93,8 +95,7 @@ echo ""
 echo -e "Check in btop, htop, top (whatever you use) if its building.
 If you have some errors when trying to rebuild, delete $OUTDIR"
 
-
-make -j$(nproc --all) -C $(pwd) O=out $FIRE_LOCALVERSION $FIRE_KBUILD a53x_defconfig >/dev/null
+make -j$(nproc --all) -C $(pwd) O=out $FIRE_LOCALVERSION $FIRE_KBUILD $FIRE_DEFCONFIG >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out $FIRE_LOCALVERSION $FIRE_KBUILD dtbs >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out $FIRE_LOCALVERSION $FIRE_KBUILD >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" INSTALL_MOD_PATH="$MODULES_OUTDIR" modules_install >/dev/null
