@@ -17,7 +17,7 @@ command_two() {
 command_three() {
     rm -rf setup.sh*
     rm -rf KernelSU*
-    curl -LSs "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh" | bash -s next
+    curl -LSs "https://raw.githubusercontent.com/Ksawlii-Android-Repos/KernelSU-Next-susfs/next/kernel/setup.sh" | bash -s next
 }
 
 command_four() {
