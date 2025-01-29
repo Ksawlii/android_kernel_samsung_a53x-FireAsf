@@ -197,6 +197,18 @@ static inline struct hlist_head *mp_hash(struct dentry *dentry)
 	return &mountpoint_hashtable[tmp & mp_hash_mask];
 }
 
+#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
+// Our own mnt_alloc_id() that assigns mnt_id starting from DEFAULT_SUS_MNT_ID
+static int susfs_mnt_alloc_id(struct mount *mnt)
+{
+	int res = ida_alloc_min(&susfs_mnt_id_ida, DEFAULT_SUS_MNT_ID, GFP_KERNEL);
+
+	if (res < 0)
+		return res;
+	mnt->mnt_id = res;
+	return 0;
+}
+#endif
 static int mnt_alloc_id(struct mount *mnt)
 {
 	int res = ida_alloc(&mnt_id_ida, GFP_KERNEL);
@@ -238,7 +250,7 @@ static void mnt_free_id(struct mount *mnt)
 static int mnt_alloc_group_id(struct mount *mnt)
 {
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
-	int res;
+  int res;
 
 	// Check if mnt has sus mnt_id
 	if (mnt->mnt_id >= DEFAULT_SUS_MNT_ID) {
@@ -309,13 +321,31 @@ int mnt_get_count(struct mount *mnt)
 #endif
 }
 
+#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
+static struct mount *alloc_vfsmnt(const char *name, bool should_spoof, int custom_mnt_id)
+#else
 static struct mount *alloc_vfsmnt(const char *name)
+#endif
 {
 	struct mount *mnt = kmem_cache_zalloc(mnt_cache, GFP_KERNEL);
 	if (mnt) {
 		int err;
 
+#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
+		if (should_spoof) {
+			if (!custom_mnt_id) {
+				err = susfs_mnt_alloc_id(mnt);
+			} else {
+				mnt->mnt_id = custom_mnt_id;
+				err = 0;
+			}
+			goto bypass_orig_flow;
+		}
+#endif
 		err = mnt_alloc_id(mnt);
+#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
+bypass_orig_flow:
+#endif
 		if (err)
 			goto out_free_cache;
 #ifdef CONFIG_KDP_NS
@@ -1146,8 +1176,18 @@ struct vfsmount *vfs_create_mount(struct fs_context *fc)
 	if (!fc->root)
 		return ERR_PTR(-EINVAL);
 
+#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
+	// For newly created mounts, the only caller process we care is KSU
+	if (unlikely(susfs_is_current_ksu_domain())) {
+		mnt = alloc_vfsmnt(fc->source ?: "none", true, 0);
+		goto bypass_orig_flow;
+	}
+	mnt = alloc_vfsmnt(fc->source ?: "none", false, 0);
+bypass_orig_flow:
+#else
 	mnt = alloc_vfsmnt(fc->source ?: "none");
-	if (!mnt)
+#endif
+  if (!mnt)
 		return ERR_PTR(-ENOMEM);
 
 	if (fc->sb_flags & SB_KERNMOUNT)
@@ -1169,12 +1209,12 @@ struct vfsmount *vfs_create_mount(struct fs_context *fc)
 	mnt->mnt_parent		= mnt;
 
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
+	// If caller process is zygote, then it is a normal mount, so we just reorder the mnt_id
 	if (susfs_is_current_zygote_domain()) {
-		mnt->mnt.susfs_orig_mnt_id = mnt->mnt_id;
+		mnt->mnt.susfs_mnt_id_backup = mnt->mnt_id;
 		mnt->mnt_id = current->susfs_last_fake_mnt_id++;
 	}
 #endif
-
 	lock_mount_hash();
 #ifdef CONFIG_KDP_NS
 	list_add_tail(&mnt->mnt_instance, &((struct kdp_mount *)mnt)->mnt->mnt_sb->s_mounts);
@@ -1257,9 +1297,53 @@ static struct mount *clone_mnt(struct mount *old, struct dentry *root,
 #endif
 	struct mount *mnt;
 	int err;
+#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
+	bool is_current_ksu_domain = susfs_is_current_ksu_domain();
+	bool is_current_zygote_domain = susfs_is_current_zygote_domain();
 
+	/* - It is very important that we need to use CL_COPY_MNT_NS to identify whether 
+	 *   the clone is a copy_tree() or single mount like called by __do_loopback()
+	 * - if caller process is KSU, consider the following situation:
+	 *     1. it is NOT doing unshare => call alloc_vfsmnt() to assign a new sus mnt_id
+	 *     2. it is doing unshare => spoof the new mnt_id with the old mnt_id
+	 * - If caller process is zygote and old mnt_id is sus => call alloc_vfsmnt() to assign a new sus mnt_id
+	 * - For the rest of caller process that doing unshare => call alloc_vfsmnt() to assign a new sus mnt_id only for old sus mount
+	 */
+	// Firstly, check if it is KSU process
+	if (unlikely(is_current_ksu_domain)) {
+		// if it is doing single clone
+		if (!(flag & CL_COPY_MNT_NS)) {
+			mnt = alloc_vfsmnt(old->mnt_devname, true, 0);
+			goto bypass_orig_flow;
+		}
+		// if it is doing unshare
+		mnt = alloc_vfsmnt(old->mnt_devname, true, old->mnt_id);
+		if (mnt) {
+			mnt->mnt.susfs_mnt_id_backup = DEFAULT_SUS_MNT_ID_FOR_KSU_PROC_UNSHARE;
+		}
+		goto bypass_orig_flow;
+	}
+	// Secondly, check if it is zygote process and no matter it is doing unshare or not
+	if (likely(is_current_zygote_domain) && (old->mnt_id >= DEFAULT_SUS_MNT_ID)) {
+		/* Important Note: 
+		 *  - Here we can't determine whether the unshare is called zygisk or not,
+		 *    so we can only patch out the unshare code in zygisk source code for now
+		 *  - But at least we can deal with old sus mounts using alloc_vfsmnt()
+		 */
+		mnt = alloc_vfsmnt(old->mnt_devname, true, 0);
+		goto bypass_orig_flow;
+	}
+	// Lastly, for other process that is doing unshare operation, but only deal with old sus mount
+	if ((flag & CL_COPY_MNT_NS) && (old->mnt_id >= DEFAULT_SUS_MNT_ID)) {
+		mnt = alloc_vfsmnt(old->mnt_devname, true, 0);
+		goto bypass_orig_flow;
+	}
+	mnt = alloc_vfsmnt(old->mnt_devname, false, 0);
+bypass_orig_flow:
+#else
 	mnt = alloc_vfsmnt(old->mnt_devname);
-	if (!mnt)
+#endif
+  if (!mnt)
 		return ERR_PTR(-ENOMEM);
 
 	if (flag & (CL_SLAVE | CL_PRIVATE | CL_SHARED_TO_SLAVE))
@@ -2798,12 +2882,15 @@ static int do_loopback(struct path *path, const char *old_name,
 	// And we target only process with ksu domain.
 	if (susfs_is_current_ksu_domain()) {
 #if defined(CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT)
-		if (susfs_auto_add_sus_bind_mount(old_name, &old_path)) {
+		if (susfs_is_auto_add_sus_bind_mount_enabled &&
+				susfs_auto_add_sus_bind_mount(old_name, &old_path)) {
 			goto orig_flow;
 		}
 #endif
 #if defined(CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT)
-		susfs_auto_add_try_umount_for_bind_mount(path);
+		if (susfs_is_auto_add_try_umount_for_bind_mount_enabled) {
+			susfs_auto_add_try_umount_for_bind_mount(path);
+		}
 #endif
 	}
 #if defined(CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT)
@@ -3996,6 +4083,7 @@ SYSCALL_DEFINE5(mount, char __user *, dev_name, char __user *, dir_name,
 		goto out_data;
 
 	ret = do_mount(kernel_dev, dir_name, kernel_type, flags, options);
+
 #if defined(CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT) && defined(CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT)
 	// Just for the compatibility of Magic Mount KernelSU
 	if (!ret && susfs_is_auto_add_sus_ksu_default_mount_enabled && susfs_is_current_ksu_domain()) {
