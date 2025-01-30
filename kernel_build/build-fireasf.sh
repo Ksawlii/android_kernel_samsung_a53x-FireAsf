@@ -8,7 +8,7 @@ FIRE_DAY_MONTH=$(date +%e | tr -d ' ') # Removes leading space for single-digit 
 FIRE_MONTH=$(date +%m)
 FIRE_YEAR=$(date +%Y)
 FIRE_HOUR=$(date +%H.%M) # Current hour in 24-hour format
-if [ "FIREASF_VANILLA" = "true" ]; then
+if [ "$FIREASF_VANILLA" = "true" ]; then
   FIRE_TYPE="Vanilla"
   FIRE_DEFCONFIG=a53x_defconfig
   FIRE_LOCALVERSION="LOCALVERSION=-FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}"
