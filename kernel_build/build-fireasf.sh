@@ -69,22 +69,24 @@ kfinish
 DIR="$(readlink -f .)"
 PARENT_DIR="$(readlink -f ${DIR}/..)"
 
-export CROSS_COMPILE="$PARENT_DIR/clang-r536225/bin/aarch64-linux-gnu-"
+export CROSS_COMPILE="$PARENT_DIR/clang-r547379/bin/aarch64-linux-gnu-"
 if [ "$USE_CCACHE" = "1" ]; then
-  export CC="$PARENT_DIR/clang-r536225/bin/clang ccache"
+  export CC="$PARENT_DIR/clang-r547379/bin/clang ccache"
 else
-  export CC="$PARENT_DIR/clang-r536225/bin/clang"
+  export CC="$PARENT_DIR/clang-r547379/bin/clang"
 fi
 
 export PLATFORM_VERSION=15.0
 export ANDROID_MAJOR_VERSION=s
-export PATH="$PARENT_DIR/build-tools/path/linux-x86:$PARENT_DIR/clang-r536225/bin:$PATH"
+export PATH="$PARENT_DIR/build-tools/path/linux-x86:$PARENT_DIR/clang-r547379/bin:$PATH"
 export TARGET_SOC=s5e8825
 export LLVM=1 LLVM_IAS=1
 export ARCH=arm64
 
-if [ ! -d "$PARENT_DIR/clang-r536225" ]; then
-  git clone -j$(nproc --all) https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r536225.git -b 15.0 "$PARENT_DIR/clang-r536225" --depth=1
+if [ ! -d "$PARENT_DIR/clang-r547379" ]; then
+    mkdir -p "$PARENT_DIR/clang-r547379"
+    wget -P "$PARENT_DIR" "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-r547379.tar.gz"
+    tar -xzf "$PARENT_DIR/clang-r547379.tar.gz" -C "$PARENT_DIR/clang-r547379"
 fi
 
 if [ ! -d "$PARENT_DIR/build-tools" ]; then
