@@ -8,8 +8,17 @@
 #include <../../../kernel/sched/sched.h>
 #include <linux/string.h>
 
-static const char *com_miui_home = "com.miui.home";
-static const char *com_android_systemui = "ndroid.systemui";
+static const char *task_name[] = {
+	"com.miui.home",
+	".globallauncher",  // com.mi.android.globallauncher
+	"droid.launcher3",  // com.android.launcher3
+	"ion.XOSLauncher", // com.transsion.XOSLauncher
+	"sion.hilauncher", // com.transsion.hilauncher
+	"ndroid.systemui",  // com.android.systemui
+	// "surfaceflinger",
+	"cameraserver",
+	"rsonalassistant",  // com.miui.personalassistant
+};
 
 static int to_userspace_prio(int policy, int kernel_priority) {
 	if (fair_policy(policy))
@@ -18,12 +27,39 @@ static int to_userspace_prio(int policy, int kernel_priority) {
 		return MAX_USER_RT_PRIO - 1 - kernel_priority;
 }
 
-static bool is_home_systemui_task(struct binder_transaction *t) {
-	if (t && t->from && t->from->task && (!(t->flags & TF_ONE_WAY)) &&
-		rt_policy(t->from->task->policy) && (t->from->task->pid == t->from->task->tgid) &&
-		((strncmp(t->from->task->comm, com_miui_home, strlen(com_miui_home)) == 0) ||
-		(strncmp(t->from->task->comm, com_android_systemui, strlen(com_android_systemui)) == 0))) {
-		return true;
+static bool set_binder_rt_task(struct binder_transaction *t) {
+	int i;
+
+	if (t && t->from && t->from->task && t->to_proc && t->to_proc->tsk && (!(t->flags & TF_ONE_WAY)) &&
+	    rt_policy(t->from->task->policy)) {
+		#define from_task_comm    t->from->task->comm
+		#define from_task_gl_comm t->from->task->group_leader->comm
+
+		if (!strncmp(from_task_gl_comm, "com.miui.home", strlen("com.miui.home")) &&
+		    !strncmp(from_task_comm, "RenderThread", strlen("RenderThread")) &&
+		    !strncmp(t->to_proc->tsk->comm, "surfaceflinger", strlen("surfaceflinger")))
+			return true;
+		if (!strncmp(from_task_gl_comm, "surfaceflinger", strlen("surfaceflinger")) &&
+		    !strncmp(from_task_comm, "passBlur", strlen("passBlur")))
+			return true;
+		if (!strncmp(from_task_gl_comm, "cameraserver", strlen("cameraserver")) &&
+		    !strncmp(from_task_comm, "C3Dev-", strlen("C3Dev-")) &&
+		    strstr(from_task_comm, "-ReqQ"))
+			return true;
+		/*
+		 * `wmshell.main` and `wmshell.splashscreen` threads are defined in
+		 * `com.android.wm.shell.dagger.WMShellConcurrencyModule` in the Android source code.
+		 */
+		if (!strncmp(from_task_comm, "wmshell.main", strlen("wmshell.main")) ||
+		    !strncmp(from_task_comm, "ll.splashscreen", strlen("ll.splashscreen")))
+			return true;
+		if (t->from->task->pid == t->from->task->tgid)
+			for (i = 0; i < ARRAY_SIZE(task_name); i++)
+				if (strncmp(from_task_comm, task_name[i], strlen(task_name[i])) == 0)
+					return true;
+
+		#undef from_task_comm
+		#undef from_task_gl_comm
 	}
 	return false;
 }
@@ -37,7 +73,7 @@ static void extend_surfacefinger_binder_set_priority_handler(void *data, struct 
 	desired.prio = target_node->min_priority;
 	desired.sched_policy = target_node->sched_policy;
 	policy = desired.sched_policy;
-	if (is_home_systemui_task(t)) {
+	if (set_binder_rt_task(t)) {
 		desired.sched_policy = SCHED_FIFO;
 		desired.prio = 98;
 		policy = desired.sched_policy;

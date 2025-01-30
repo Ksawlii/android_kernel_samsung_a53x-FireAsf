@@ -114,9 +114,6 @@ static bool sugov_update_next_freq(struct sugov_policy *sg_policy, u64 time,
 		sg_policy->need_freq_update = cpufreq_driver_test_flags(CPUFREQ_NEED_UPDATE_LIMITS);
 	}
 
-	if (sg_policy->next_freq > next_freq)
-		next_freq = (sg_policy->next_freq + next_freq) >> 1;
-
 	sg_policy->next_freq = next_freq;
 	sg_policy->last_freq_update_time = time;
 
@@ -172,6 +169,7 @@ static unsigned int get_next_freq(struct sugov_policy *sg_policy,
 				policy->cpuinfo.max_freq : policy->cur;
 	unsigned long next_freq = 0;
 
+	util = map_util_perf(util);
 	trace_android_vh_map_util_freq(util, freq, max, &next_freq, policy,
 			&sg_policy->need_freq_update);
 	if (next_freq)
@@ -425,10 +423,7 @@ static unsigned long sugov_iowait_apply(struct sugov_cpu *sg_cpu, u64 time,
 	 * into the same scale so we can compare.
 	 */
 	boost = (sg_cpu->iowait_boost * max) >> SCHED_CAPACITY_SHIFT;
-	boost = max(boost, util);
-	boost = uclamp_rq_util_with(cpu_rq(sg_cpu->cpu), boost, NULL);
-
-	return boost;
+	return max(boost, util);
 }
 
 #ifdef CONFIG_NO_HZ_COMMON
@@ -559,11 +554,11 @@ static void sugov_work(struct kthread_work *work)
 	/*
 	 * Hold sg_policy->update_lock shortly to handle the case where:
 	 * incase sg_policy->next_freq is read here, and then updated by
-	 * sugov_deferred_update() just before work_in_progress is set to false
+	 * sugov_update_shared just before work_in_progress is set to false
 	 * here, we may miss queueing the new update.
 	 *
 	 * Note: If a work was queued after the update_lock is released,
-	 * sugov_work() will just be called again by kthread_work code; and the
+	 * sugov_work will just be called again by kthread_work code; and the
 	 * request will be proceed before the sugov thread sleeps.
 	 */
 	raw_spin_lock_irqsave(&sg_policy->update_lock, flags);

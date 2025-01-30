@@ -109,8 +109,8 @@ __setup("sched_thermal_decay_shift=", setup_sched_thermal_decay_shift);
 #ifdef CONFIG_SCHED_BORE
 uint __read_mostly sched_bore                   = 1;
 uint __read_mostly sched_burst_smoothness_long  = 1;
-uint __read_mostly sched_burst_smoothness_short = 1;
-uint __read_mostly sched_burst_fork_atavistic   = 0;
+uint __read_mostly sched_burst_smoothness_short = 0;
+uint __read_mostly sched_burst_fork_atavistic   = 2;
 uint __read_mostly sched_burst_penalty_offset   = 22;
 uint __read_mostly sched_burst_penalty_scale    = 1280;
 uint __read_mostly sched_burst_cache_lifetime   = 60000000;
@@ -193,11 +193,11 @@ static void restart_burst(struct sched_entity *se) {
 
 #ifdef CONFIG_SMP
 /*
- * For asym packing, by default the lower numbered CPU has higher priority.
+ * For asym packing, by default the lower max-capacity CPU has higher priority.
  */
 int __weak arch_asym_cpu_priority(int cpu)
 {
-	return -cpu;
+	return -arch_scale_cpu_capacity(cpu);
 }
 
 /*
@@ -7011,7 +7011,7 @@ compute_energy(struct task_struct *p, int dst_cpu, struct perf_domain *pd)
 
 	trace_android_vh_em_cpu_energy(pd->em_pd, max_util, sum_util, &energy);
 	if (!energy)
-		energy = em_cpu_energy(pd->em_pd, max_util, sum_util);
+		energy = em_cpu_energy(pd->em_pd, max_util, sum_util, cpu_cap);
 
 	return energy;
 }

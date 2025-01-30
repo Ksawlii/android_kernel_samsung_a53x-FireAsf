@@ -8,7 +8,6 @@ ems.ko
 zsmalloc.ko
 lzo.ko
 lzo-rle.ko
-ssg.ko
 phy-exynos-mipi-dsim.ko
 phy-exynos-mipi.ko
 phy-exynos-usbdrd-super.ko
@@ -35,7 +34,6 @@ exynos-pd_el3.ko
 exynos-pd-dbg.ko
 cmupmucal.ko
 exynos_acpm.ko
-plugin_dbg.ko
 memlogger.ko
 sysevent.ko
 sysevent_notif.ko
@@ -213,7 +211,6 @@ nanohub.ko
 exynos_devfreq.ko
 s2mpu13_adc.ko
 npu.ko
-sec_pm_debug.ko
 sec_thermistor.ko
 sec_wakeup_cpu_allocator.ko
 sec_reboot.ko
@@ -280,7 +277,6 @@ snd-soc-samsung-vts.ko
 snd-soc-samsung-slif.ko
 exynos8825_audio.ko
 sec_audio_sysfs.ko
-sec_audio_debug.ko
 tcp_westwood.ko
 tcp_htcp.ko
 cfg80211.ko

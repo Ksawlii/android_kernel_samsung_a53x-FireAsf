@@ -22,10 +22,8 @@ int exynos_acpm_set_rate(unsigned int id, unsigned long rate, bool fast_switch)
 {
 	struct ipc_config config;
 	unsigned int cmd[4];
-	unsigned long long before, after, latency;
 	unsigned int ch;
 	int ret;
-	u32 start_time = acpm_get_peri_timer();
 
 	config.cmd = cmd;
 	config.response = !fast_switch;
@@ -33,19 +31,16 @@ int exynos_acpm_set_rate(unsigned int id, unsigned long rate, bool fast_switch)
 	config.cmd[0] = id;
 	config.cmd[1] = (unsigned int)rate;
 	config.cmd[2] = fast_switch ? FREQ_REQ_FAST : FREQ_REQ;
-	config.cmd[3] = (start_time == 0xFFFF) ? 0 : start_time;
+	config.cmd[3] = 0;
 
 	ch = fast_switch ? acpm_dvfs.fast_ch_num : acpm_dvfs.ch_num;
 
+#if defined(CONFIG_EXYNOS_DEBUG_FREQ)
 	secdbg_freq_check(id, rate);
-	before = sched_clock();
+#endif
 	ret = acpm_ipc_send_data(ch, &config);
-	after = sched_clock();
-	latency = after - before;
 	if (ret)
-		pr_err("%s:[%d] latency = %llu ret = %d",
-			__func__, id, latency, ret);
-
+		pr_err("%s:[%d] ret = %d", __func__, id, ret);
 	return ret;
 }
 EXPORT_SYMBOL_GPL(exynos_acpm_set_rate);
@@ -54,7 +49,6 @@ int exynos_acpm_set_init_freq(unsigned int dfs_id, unsigned long freq)
 {
 	struct ipc_config config;
 	unsigned int cmd[4];
-	unsigned long long before, after, latency;
 	int ret, id;
 
 	id = GET_IDX(dfs_id);
@@ -67,14 +61,9 @@ int exynos_acpm_set_init_freq(unsigned int dfs_id, unsigned long freq)
 	config.cmd[2] = DATA_INIT;
 	config.cmd[3] = SET_INIT_FREQ;
 
-	before = sched_clock();
 	ret = acpm_ipc_send_data(acpm_dvfs.ch_num, &config);
-	after = sched_clock();
-	latency = after - before;
 	if (ret)
-		pr_err("%s:[%d] latency = %llu ret = %d",
-			__func__, id, latency, ret);
-
+		pr_err("%s:[%d] ret = %d", __func__, id, ret);
 	return ret;
 }
 EXPORT_SYMBOL_GPL(exynos_acpm_set_init_freq);
@@ -83,7 +72,6 @@ unsigned long exynos_acpm_get_rate(unsigned int id)
 {
 	struct ipc_config config;
 	unsigned int cmd[4];
-	unsigned long long before, after, latency;
 	int ret;
 
 	config.cmd = cmd;
@@ -94,14 +82,9 @@ unsigned long exynos_acpm_get_rate(unsigned int id)
 	config.cmd[2] = FREQ_GET;
 	config.cmd[3] = 0;
 
-	before = sched_clock();
 	ret = acpm_ipc_send_data(acpm_dvfs.ch_num, &config);
-	after = sched_clock();
-	latency = after - before;
 	if (ret)
-		pr_err("%s:[%d] latency = %llu ret = %d", __func__,
-			id, latency, ret);
-
+		pr_err("%s:[%d] ret = %d", __func__, id, ret);
 	return config.cmd[1];
 }
 
@@ -109,7 +92,6 @@ int exynos_acpm_set_volt_margin(unsigned int id, int volt)
 {
 	struct ipc_config config;
 	unsigned int cmd[4];
-	unsigned long long before, after, latency;
 	int ret;
 	struct vclk *vclk;
 
@@ -121,13 +103,9 @@ int exynos_acpm_set_volt_margin(unsigned int id, int volt)
 	config.cmd[2] = MARGIN_REQ;
 	config.cmd[3] = 0;
 
-	before = sched_clock();
 	ret = acpm_ipc_send_data(acpm_dvfs.ch_num, &config);
-	after = sched_clock();
-	latency = after - before;
 	if (ret)
-		pr_err("%s:[%d] latency = %llu ret = %d",
-			__func__, id, latency, ret);
+		pr_err("%s:[%d] ret = %d", __func__, id, ret);
 
 	vclk = cmucal_get_node(id);
 	if (vclk) {

@@ -1,5 +1,26 @@
 #!/bin/bash
+# FireAsf Variables
 FIRE_VERSION="5.0"
+FIRE_VARIANT="StableAsf"
+FIRE_MAINTAINER="Ksawlii"
+FIRE_KBUILD="KBUILD_BUILD_USER=${FIRE_MAINTAINER} KBUILD_BUILD_HOST=FireAsFuck"
+FIRE_DAY_MONTH=$(date +%e | tr -d ' ') # Removes leading space for single-digit days
+FIRE_MONTH=$(date +%m)
+FIRE_YEAR=$(date +%Y)
+FIRE_HOUR=$(date +%H.%M) # Current hour in 24-hour format
+if [ "FIREASF_VANILLA" = "true" ]; then
+  FIRE_TYPE="Vanilla"
+  FIRE_DEFCONFIG=a53x_defconfig
+  FIRE_LOCALVERSION="LOCALVERSION=-FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}"
+  KERNELZIP="$(pwd)/kernel_build/FireAsf/$FIRE_DAY_MONTH.$FIRE_MONTH.$FIRE_YEAR/FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}-${FIRE_HOUR}.zip"
+  KERNELTAR="$(pwd)/kernel_build/FireAsf/$FIRE_DAY_MONTH.$FIRE_MONTH.$FIRE_YEAR/FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}-${FIRE_HOUR}.tar"
+else
+  FIRE_TYPE="KN"
+  FIRE_DEFCONFIG=a53x-ksu_defconfig
+  FIRE_LOCALVERSION="LOCALVERSION=-FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}"
+  KERNELZIP="$(pwd)/kernel_build/FireAsf/$FIRE_DAY_MONTH.$FIRE_MONTH.$FIRE_YEAR/FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}-${FIRE_HOUR}.zip"
+  KERNELTAR="$(pwd)/kernel_build/FireAsf/$FIRE_DAY_MONTH.$FIRE_MONTH.$FIRE_YEAR/FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}-${FIRE_HOUR}.tar"
+fi
 
 set -e
 
@@ -33,20 +54,10 @@ MODULES_DIR="$DLKM_RAMDISK_DIR/lib/modules"
 MKBOOTIMG="$(pwd)/kernel_build/mkbootimg/mkbootimg.py"
 MKDTBOIMG="$(pwd)/kernel_build/dtb/mkdtboimg.py"
 
-DAY_MONTH=$(date +%e | tr -d ' ') # Removes leading space for single-digit days
-MONTH=$(date +%m)
-YEAR=$(date +%Y)
-HOUR=$(date +%H.%M) # Current hour in 24-hour format
-
-OUT_KERNELZIP="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-KSU-Next-Stable-${HOUR}.zip"
-OUT_KERNELTAR="$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR/FireAsf-${FIRE_VERSION}-KSU-Next-Stable-${HOUR}.tar"
 OUT_KERNEL="$OUTDIR/arch/arm64/boot/Image"
 OUT_BOOTIMG="$(pwd)/kernel_build/zip/boot.img"
 OUT_VENDORBOOTIMG="$(pwd)/kernel_build/zip/vendor_boot.img"
 OUT_DTBIMAGE="$TMPDIR/dtb.img"
-
-# Kernel-side
-BUILD_ARGS="LOCALVERSION=-FireAsf-${FIRE_VERSION}-KSU-Next-StableAsf KBUILD_BUILD_USER=Ksawlii KBUILD_BUILD_HOST=FireAsFuck"
 
 kfinish() {
     rm -rf "$TMPDIR"
@@ -58,18 +69,24 @@ kfinish
 DIR="$(readlink -f .)"
 PARENT_DIR="$(readlink -f ${DIR}/..)"
 
-export CROSS_COMPILE="$PARENT_DIR/clang-r536225/bin/aarch64-linux-gnu-"
-export CC="$PARENT_DIR/clang-r536225/bin/clang"
+export CROSS_COMPILE="$PARENT_DIR/clang-r547379/bin/aarch64-linux-gnu-"
+if [ "$USE_CCACHE" = "1" ]; then
+  export CC="$PARENT_DIR/clang-r547379/bin/clang ccache"
+else
+  export CC="$PARENT_DIR/clang-r547379/bin/clang"
+fi
 
 export PLATFORM_VERSION=15.0
 export ANDROID_MAJOR_VERSION=s
-export PATH="$PARENT_DIR/build-tools/path/linux-x86:$PARENT_DIR/clang-r536225/bin:$PATH"
+export PATH="$PARENT_DIR/build-tools/path/linux-x86:$PARENT_DIR/clang-r547379/bin:$PATH"
 export TARGET_SOC=s5e8825
 export LLVM=1 LLVM_IAS=1
 export ARCH=arm64
 
-if [ ! -d "$PARENT_DIR/clang-r536225" ]; then
-  git clone -j$(nproc --all) https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r536225.git -b 15.0 "$PARENT_DIR/clang-r536225" --depth=1
+if [ ! -d "$PARENT_DIR/clang-r547379" ]; then
+    mkdir -p "$PARENT_DIR/clang-r547379"
+    wget -P "$PARENT_DIR" "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-r547379.tar.gz"
+    tar -xzf "$PARENT_DIR/clang-r547379.tar.gz" -C "$PARENT_DIR/clang-r547379"
 fi
 
 if [ ! -d "$PARENT_DIR/build-tools" ]; then
@@ -79,9 +96,10 @@ fi
 echo ""
 echo -e "Check in btop, htop, top (whatever you use) if its building.
 If you have some errors when trying to rebuild, delete $OUTDIR"
-make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x-ksu_defconfig >/dev/null
-make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS dtbs >/dev/null
-make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS >/dev/null
+
+make -j$(nproc --all) -C $(pwd) O=out $FIRE_LOCALVERSION $FIRE_KBUILD $FIRE_DEFCONFIG >/dev/null
+make -j$(nproc --all) -C $(pwd) O=out $FIRE_LOCALVERSION $FIRE_KBUILD dtbs >/dev/null
+make -j$(nproc --all) -C $(pwd) O=out $FIRE_LOCALVERSION $FIRE_KBUILD >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" INSTALL_MOD_PATH="$MODULES_OUTDIR" modules_install >/dev/null
 
 rm -rf "$TMPDIR"
@@ -166,25 +184,25 @@ cd "$DIR"
 
 
 echo "Building a flashable zip file (Recovery)..."
-mkdir -p "$(pwd)/kernel_build/FireAsf/$DAY_MONTH.$MONTH.$YEAR"
+mkdir -p "$(pwd)/kernel_build/FireAsf/$FIRE_DAY_MONTH.$FIRE_MONTH.$FIRE_YEAR"
 cd "$(pwd)/kernel_build/zip"
-rm -f "$OUT_KERNELZIP"
+rm -f "$KERNELZIP"
 brotli --quality=11 -c boot.img > boot.br
 brotli --quality=11 -c vendor_boot.img > vendor_boot.br
-zip -r9 -q "$OUT_KERNELZIP" META-INF boot.br vendor_boot.br
+zip -r9 -q "$KERNELZIP" META-INF boot.br vendor_boot.br
 rm -f boot.br vendor_boot.br
 cd "$DIR"
-echo "Done! Output: $OUT_KERNELZIP"
+echo "Done! Output: $KERNELZIP"
 
 echo "Building a flashable tar file (Download Mode)..."
 cd "$(pwd)/kernel_build"
-rm -f "$OUT_KERNELTAR"
+rm -f "$KERNELTAR"
 lz4 -c -12 -B6 --content-size "$OUT_BOOTIMG" > boot.img.lz4
 lz4 -c -12 -B6 --content-size "$OUT_VENDORBOOTIMG" > vendor_boot.img.lz4
-tar -cf "$OUT_KERNELTAR" boot.img.lz4 vendor_boot.img.lz4
+tar -cf "$KERNELTAR" boot.img.lz4 vendor_boot.img.lz4
 cd "$DIR"
 rm -f boot.img.lz4 vendor_boot.img.lz4
-echo "Done! Output: $OUT_KERNELTAR"
+echo "Done! Output: $KERNELTAR"
 
 echo "Cleaning..."
 rm -f "${OUT_VENDORBOOTIMG}" "${OUT_BOOTIMG}"
