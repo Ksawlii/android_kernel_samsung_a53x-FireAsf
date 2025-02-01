@@ -17,12 +17,8 @@ command_two() {
 command_three() {
     rm -rf setup.sh*
     rm -rf KernelSU*
-    curl -LSs "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh" | bash -s next
-    cp $(pwd)/patches/Implement-SUSFS-v1.5.4-for-KernelSU-Next.patch $(pwd)/KernelSU-Next/Implement-SUSFS-v1.5.4-for-KernelSU-Next.patch
-    cd $(pwd)/KernelSU-Next/
-    patch -p1 < Implement-SUSFS-v1.5.4-for-KernelSU-Next.patch
-    cd ..
-    echo "Applied susfs4ksu"
+    curl -LSs "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next-susfs/kernel/setup.sh" | bash -s next-susfs
+    echo "Applied KernelSU-Next & susfs4ksu"
 }
 
 command_four() {
