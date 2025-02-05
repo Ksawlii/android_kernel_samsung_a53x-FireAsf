@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.10.233 Kernel Configuration
+# Linux/arm64 5.10.234 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="Android (12806354, +pgo, +bolt, +lto, +mlgo, based on r547379) clang version 20.0.0 (https://android.googlesource.com/toolchain/llvm-project b718bcaf8c198c82f3021447d943401e3ab5bd54)"
 CONFIG_GCC_VERSION=0
@@ -4656,6 +4656,7 @@ CONFIG_SND_SOC_SAMSUNG_EXYNOS8825_AUDIO=m
 # CONFIG_SND_SOC_SAMSUNG_EXYNOS8825_RT5691 is not set
 # CONFIG_SND_SOC_SAMSUNG_RAINBOW_PRINCE is not set
 # CONFIG_SND_SOC_ARNDALE is not set
+# CONFIG_SND_SOC_SAMSUNG_ARIES_WM8994 is not set
 # CONFIG_SND_SOC_SAMSUNG_MIDAS_WM1811 is not set
 CONFIG_SND_SOC_SAMSUNG_AUDIO=m
 # CONFIG_SND_SOC_SAMSUNG_DEBUG is not set
