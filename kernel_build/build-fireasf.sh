@@ -35,7 +35,9 @@ if [ "$(uname -m)" != "x86_64" ]; then
   exit 1
 fi
 
-export PATH="$(pwd)/kernel_build/bin:$PATH"
+if [[ $(whoami) != "ksawlii" ]]; then
+  export PATH="$(pwd)/kernel_build/bin:$PATH"
+fi
 
 # Configs
 OUTDIR="$(pwd)/out"
