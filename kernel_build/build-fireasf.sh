@@ -196,13 +196,9 @@ mkdir -p "$(pwd)/kernel_build/FireAsf/$FIRE_DAY_MONTH.$FIRE_MONTH.$FIRE_YEAR"
 cd "$FIRE_ANYKERNEL3"
 rm -f "$KERNELZIP"
 if [ "$FIRE_VARIANT" = "StableAsf" ]; then
-  brotli --quality=11 -c boot.img > boot.br
-  brotli --quality=11 -c vendor_boot.img > vendor_boot.br
-  zip -r9 -q "$KERNELZIP" anykernel.sh banner boot.br META-INF modules patch ramdisk tools vendor_boot.br
+  zip -r9 -q "$KERNELZIP" $TMPDIR/dtb.img anykernel.sh banner boot.br META-INF modules patch ramdisk tools vendor_boot.br
 else
-  #brotli -c boot.img > boot.br
-  #brotli -c vendor_boot.img > vendor_boot.br
-  zip -r0 -q "$KERNELZIP" anykernel.sh banner boot.img META-INF modules patch ramdisk tools vendor_boot.img
+  zip -r0 -q "$KERNELZIP" $TMPDIR/dtb.img anykernel.sh banner boot.img META-INF modules patch ramdisk tools vendor_boot.img
 fi
 rm -f boot.br vendor_boot.br
 cd "$DIR"
