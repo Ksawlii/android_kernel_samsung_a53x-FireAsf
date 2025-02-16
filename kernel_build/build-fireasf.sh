@@ -210,8 +210,8 @@ if [ "$FIRE_VARIANT" = "StableAsf" ]; then
   lz4 -c -12 -B6 --content-size "$OUT_VENDORBOOTIMG" > vendor_boot.img.lz4
   tar -cf "$KERNELTAR" boot.img.lz4 vendor_boot.img.lz4
 else
-  lz4 -c "$OUT_BOOTIMG" > boot.img.lz4
-  lz4 -c "$OUT_VENDORBOOTIMG" > vendor_boot.img.lz4
+  lz4 -c -1 -B6 --content-size "$OUT_BOOTIMG" > boot.img.lz4
+  lz4 -c -1 -B6 --content-size "$OUT_VENDORBOOTIMG" > vendor_boot.img.lz4
   tar -cf "$KERNELTAR" boot.img.lz4 vendor_boot.img.lz4
 fi
 cd "$DIR"
