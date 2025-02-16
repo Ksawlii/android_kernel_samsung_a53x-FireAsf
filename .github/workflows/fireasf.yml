@@ -33,6 +33,7 @@ jobs:
         rm -rf setup.sh* KernelSU*
         curl -LSs "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next-susfs/kernel/setup.sh" | bash -s next-susfs
         echo "Applied KernelSU-Next & susfs4ksu"
+        export WORKFLOW=true
         export FIREASF_VANILLA=true
         ./kernel_build/build-fireasf.sh "$(pwd)" || exit 1
         export FIREASF_VANILLA=false

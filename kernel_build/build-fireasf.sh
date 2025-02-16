@@ -36,7 +36,7 @@ if [ "$(uname -m)" != "x86_64" ]; then
   exit 1
 fi
 
-if [[ $(whoami) != "ksawlii" ]]; then
+if [[ $(whoami) != "ksawlii" && "$WORKFLOW" != "true" ]]; then
   export PATH="$(pwd)/kernel_build/bin:$PATH"
 fi
 
