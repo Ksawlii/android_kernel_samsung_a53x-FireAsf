@@ -189,9 +189,15 @@ echo "Building a flashable zip file (Recovery)..."
 mkdir -p "$(pwd)/kernel_build/FireAsf/$FIRE_DAY_MONTH.$FIRE_MONTH.$FIRE_YEAR"
 cd "$(pwd)/kernel_build/zip"
 rm -f "$KERNELZIP"
-brotli --quality=11 -c boot.img > boot.br
-brotli --quality=11 -c vendor_boot.img > vendor_boot.br
-zip -r9 -q "$KERNELZIP" META-INF boot.br vendor_boot.br
+if [ "$FIRE_VARIANT" = "StableAsf" ]; then
+  brotli --quality=11 -c boot.img > boot.br
+  brotli --quality=11 -c vendor_boot.img > vendor_boot.br
+  zip -r9 -q "$KERNELZIP" META-INF boot.br vendor_boot.br 
+else
+  brotli -c boot.img > boot.br
+  brotli -c vendor_boot.img > vendor_boot.br
+  zip -r0 -q "$KERNELZIP" META-INF boot.br vendor_boot.br
+fi
 rm -f boot.br vendor_boot.br
 cd "$DIR"
 echo "Done! Output: $KERNELZIP"
@@ -199,9 +205,15 @@ echo "Done! Output: $KERNELZIP"
 echo "Building a flashable tar file (Download Mode)..."
 cd "$(pwd)/kernel_build"
 rm -f "$KERNELTAR"
-lz4 -c -12 -B6 --content-size "$OUT_BOOTIMG" > boot.img.lz4
-lz4 -c -12 -B6 --content-size "$OUT_VENDORBOOTIMG" > vendor_boot.img.lz4
-tar -cf "$KERNELTAR" boot.img.lz4 vendor_boot.img.lz4
+if [ "$FIRE_VARIANT" = "StableAsf" ]; then
+  lz4 -c -12 -B6 --content-size "$OUT_BOOTIMG" > boot.img.lz4
+  lz4 -c -12 -B6 --content-size "$OUT_VENDORBOOTIMG" > vendor_boot.img.lz4
+  tar -cf "$KERNELTAR" boot.img.lz4 vendor_boot.img.lz4
+else
+  lz4 -c "$OUT_BOOTIMG" > boot.img.lz4
+  lz4 -c "$OUT_VENDORBOOTIMG" > vendor_boot.img.lz4
+  tar -cf "$KERNELTAR" boot.img.lz4 vendor_boot.img.lz4
+fi
 cd "$DIR"
 rm -f boot.img.lz4 vendor_boot.img.lz4
 echo "Done! Output: $KERNELTAR"
