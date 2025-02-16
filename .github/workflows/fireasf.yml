@@ -22,7 +22,7 @@ jobs:
       run: |
         sudo apt-get update -y || sudo apt-get update -y || true
         sudo apt-get upgrade -y || sudo apt-get upgrade -y || true
-        sudo apt-get install brotli zip zstd tar lz4 cpio xz-utils -y || sudo apt-get install brotli zip zstd tar lz4 cpio xz-utils -y
+        sudo apt-get install brotli zip zstd tar lz4 cpio xz-utils python2 -y || sudo apt-get install brotli zip zstd tar lz4 cpio xz-utils python2 -y
 
     - name: Get current date
       id: date
