@@ -8,6 +8,7 @@ FIRE_DAY_MONTH=$(date +%e | tr -d ' ') # Removes leading space for single-digit 
 FIRE_MONTH=$(date +%m)
 FIRE_YEAR=$(date +%Y)
 FIRE_HOUR=$(date +%H.%M) # Current hour in 24-hour format
+FIRE_ANYKERNEL3="$(pwd)/kernel_build/fire_zip"
 if [ "$FIREASF_VANILLA" = "true" ]; then
   FIRE_TYPE="Vanilla"
   FIRE_DEFCONFIG=a53x_defconfig
@@ -57,8 +58,8 @@ MKBOOTIMG="$(pwd)/kernel_build/mkbootimg/mkbootimg.py"
 MKDTBOIMG="$(pwd)/kernel_build/dtb/mkdtboimg.py"
 
 OUT_KERNEL="$OUTDIR/arch/arm64/boot/Image"
-OUT_BOOTIMG="$(pwd)/kernel_build/zip/boot.img"
-OUT_VENDORBOOTIMG="$(pwd)/kernel_build/zip/vendor_boot.img"
+OUT_BOOTIMG="$(pwd)/kernel_build/fire_zip/boot.img"
+OUT_VENDORBOOTIMG="$(pwd)/kernel_build/fire_zip/vendor_boot.img"
 OUT_DTBIMAGE="$TMPDIR/dtb.img"
 
 kfinish() {
@@ -155,6 +156,11 @@ python2 "$MKDTBOIMG" create "$OUT_DTBIMAGE" --custom0=0x00000000 --custom1=0xff0
 
 echo "Building boot image..."
 
+# TODO: Create a seperate shell script for dependencies
+if [ ! -d "$FIRE_ANYKERNEL3" ]; then
+  git clone -j$(nproc --all) https://github.com/Ksawlii-Android-Repos/AnyKernel3-a53x.git -b master "$FIRE_ANYKERNEL3"
+fi
+
 $MKBOOTIMG --header_version 4 \
     --kernel "$OUT_KERNEL" \
     --output "$OUT_BOOTIMG" \
@@ -187,16 +193,16 @@ cd "$DIR"
 
 echo "Building a flashable zip file (Recovery)..."
 mkdir -p "$(pwd)/kernel_build/FireAsf/$FIRE_DAY_MONTH.$FIRE_MONTH.$FIRE_YEAR"
-cd "$(pwd)/kernel_build/zip"
+cd "$FIRE_ANYKERNEL3"
 rm -f "$KERNELZIP"
 if [ "$FIRE_VARIANT" = "StableAsf" ]; then
   brotli --quality=11 -c boot.img > boot.br
   brotli --quality=11 -c vendor_boot.img > vendor_boot.br
-  zip -r9 -q "$KERNELZIP" META-INF boot.br vendor_boot.br 
+  zip -r9 -q "$KERNELZIP" anykernel.sh banner boot.br META-INF modules patch ramdisk tools vendor_boot.br
 else
-  brotli -c boot.img > boot.br
-  brotli -c vendor_boot.img > vendor_boot.br
-  zip -r0 -q "$KERNELZIP" META-INF boot.br vendor_boot.br
+  #brotli -c boot.img > boot.br
+  #brotli -c vendor_boot.img > vendor_boot.br
+  zip -r0 -q "$KERNELZIP" anykernel.sh banner boot.img META-INF modules patch ramdisk tools vendor_boot.img
 fi
 rm -f boot.br vendor_boot.br
 cd "$DIR"

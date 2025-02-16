@@ -1,3 +1,6 @@
+# AnyKernel3
+kernel_build/fire_zip/
+
 # Build files
 kernel_build/*.zip
 kernel_build/*.tar
