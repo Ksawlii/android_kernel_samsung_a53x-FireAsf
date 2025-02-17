@@ -15,14 +15,24 @@ jobs:
       with:
         ref: '5.10.234-testing' 
 
-    - name: Clean
-      uses: rokibhasansagar/slimhub_actions@main
+        #- name: Clean
+    #   uses: rokibhasansagar/slimhub_actions@main
 
     - name: Install tools
       run: |
         sudo apt-get update -y || sudo apt-get update -y || true
         sudo apt-get upgrade -y || sudo apt-get upgrade -y || true
-        sudo apt-get install brotli zip zstd tar lz4 cpio xz-utils python2 -y || sudo apt-get install brotli zip zstd tar lz4 cpio xz-utils python2 -y
+        sudo apt-get install brotli zip zstd tar lz4 cpio xz-utils essential checkinstall libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev -y || sudo apt-get install brotli zip zstd tar lz4 cpio xz-utils essential checkinstall libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev -y
+
+    - name: Build python2
+      run: |
+        wget https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
+        tar -xvf Python-2.7.18.tgz
+        cd Python-2.7.18
+        ./configure --enable-optimizations
+        make -j$(nproc --all)
+        sudo ln -sf ./python /usr/bin/python2
+
 
     - name: Get current date
       id: date
