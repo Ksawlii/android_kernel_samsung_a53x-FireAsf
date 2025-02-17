@@ -80,7 +80,7 @@ else
 fi
 
 export PLATFORM_VERSION=15.0
-export ANDROID_MAJOR_VERSION=s
+export ANDROID_MAJOR_VERSION=v
 export PATH="$PARENT_DIR/build-tools/path/linux-x86:$PARENT_DIR/clang-r547379/bin:$PATH"
 export TARGET_SOC=s5e8825
 export LLVM=1 LLVM_IAS=1
