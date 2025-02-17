@@ -15,8 +15,8 @@ jobs:
       with:
         ref: '5.10.234-testing' 
 
-        #- name: Clean
-    #   uses: rokibhasansagar/slimhub_actions@main
+    - name: Clean
+      uses: rokibhasansagar/slimhub_actions@main
 
     - name: Install tools
       run: |
