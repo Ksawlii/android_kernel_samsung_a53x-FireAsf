@@ -1,4 +1,21 @@
 #!/bin/bash
+set -e
+
+if [ -z "$1" ]; then
+    echo "Please exec from root directory"
+    exit 1
+fi
+cd "$1"
+
+if [ "$(uname -m)" != "x86_64" ]; then
+  echo "This script requires an x86_64 (64-bit) machine."
+  exit 1
+fi
+
+if [[ $(whoami) != "ksawlii" && "$WORKFLOW" != "true" ]]; then
+  export PATH="$(pwd)/kernel_build/bin:$PATH"
+fi
+
 # FireAsf Variables
 FIRE_VERSION="6.0"
 FIRE_VARIANT="UnstableAsf"
@@ -23,74 +40,73 @@ else
   KERNELTAR="$(pwd)/kernel_build/FireAsf/$FIRE_DAY_MONTH.$FIRE_MONTH.$FIRE_YEAR/FireAsf-${FIRE_VERSION}-${FIRE_TYPE}-${FIRE_VARIANT}-${FIRE_HOUR}.tar"
 fi
 
-set -e
-
-if [ -z "$1" ]; then
-    echo "Please exec from root directory"
-    exit 1
-fi
-cd "$1"
-
-if [ "$(uname -m)" != "x86_64" ]; then
-  echo "This script requires an x86_64 (64-bit) machine."
-  exit 1
-fi
-
-if [[ $(whoami) != "ksawlii" && "$WORKFLOW" != "true" ]]; then
-  export PATH="$(pwd)/kernel_build/bin:$PATH"
-fi
-
 # Configs
+# Output directories
 OUTDIR="$(pwd)/out"
 MODULES_OUTDIR="$(pwd)/modules_out"
 TMPDIR="$(pwd)/kernel_build/tmp"
 
+# Input directories  
 IN_PLATFORM="$(pwd)/kernel_build/vboot_platform"
 IN_DLKM="$(pwd)/kernel_build/vboot_dlkm"
 IN_DTB="$OUTDIR/arch/arm64/boot/dts/exynos/s5e8825.dtb"
 
+# Ramdisk directories  
 PLATFORM_RAMDISK_DIR="$TMPDIR/ramdisk_platform"
 DLKM_RAMDISK_DIR="$TMPDIR/ramdisk_dlkm"
 PREBUILT_RAMDISK="$(pwd)/kernel_build/boot/ramdisk"
+
+# Modules directory  
 MODULES_DIR="$DLKM_RAMDISK_DIR/lib/modules"
 
+# Boot image tools 
 MKBOOTIMG="$(pwd)/kernel_build/mkbootimg/mkbootimg.py"
 MKDTBOIMG="$(pwd)/kernel_build/dtb/mkdtboimg.py"
 
+# Output files
 OUT_KERNEL="$OUTDIR/arch/arm64/boot/Image"
 OUT_BOOTIMG="$(pwd)/kernel_build/fire_zip/boot.img"
 OUT_VENDORBOOTIMG="$(pwd)/kernel_build/fire_zip/vendor_boot.img"
 OUT_DTBIMAGE="$TMPDIR/dtb.img"
 
-kfinish() {
-    rm -rf "$TMPDIR"
-    rm -rf "$MODULES_OUTDIR"
-}
+# Directories
+CURRENT_DIR="$(readlink -f .)"
+PARENT_DIR="$(readlink -f ${CURRENT_DIR}/..)"
 
-kfinish
-
-DIR="$(readlink -f .)"
-PARENT_DIR="$(readlink -f ${DIR}/..)"
-
-export CROSS_COMPILE="$PARENT_DIR/clang-r547379/bin/aarch64-linux-gnu-"
+# Compiler Stuff
+export CLANG_VERSION="547379"
+export CROSS_COMPILE="$PARENT_DIR/clang-r$CLANG_VERSION/bin/aarch64-linux-gnu-"
 if [ "$USE_CCACHE" = "1" ]; then
-  export CC="$PARENT_DIR/clang-r547379/bin/clang ccache"
+  export CC="$PARENT_DIR/clang-r$CLANG_VERSION/bin/clang ccache"
 else
-  export CC="$PARENT_DIR/clang-r547379/bin/clang"
+  export CC="$PARENT_DIR/clang-r$CLANG_VERSION/bin/clang"
 fi
 
+# AOSP Stuff
 export PLATFORM_VERSION=15.0
 export ANDROID_PLATFORM_VERSION="$PLATFORM_VERSION"
 export ANDROID_MAJOR_VERSION=v
-export PATH="$PARENT_DIR/build-tools/path/linux-x86:$PARENT_DIR/clang-r547379/bin:$PATH"
+
+# Kernel Stuff
+export PATH="$PARENT_DIR/build-tools/path/linux-x86:$PARENT_DIR/clang-r$CLANG_VERSION/bin:$PATH"
 export TARGET_SOC=s5e8825
 export LLVM=1 LLVM_IAS=1
 export ARCH=arm64
 
-if [ ! -d "$PARENT_DIR/clang-r547379" ]; then
-    mkdir -p "$PARENT_DIR/clang-r547379"
-    wget -P "$PARENT_DIR" "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-r547379.tar.gz"
-    tar -xzf "$PARENT_DIR/clang-r547379.tar.gz" -C "$PARENT_DIR/clang-r547379"
+
+# Clean Output Stuff
+clean_dirs() {
+    rm -rf "$TMPDIR"
+    rm -rf "$MODULES_OUTDIR"
+}
+
+clean_dirs
+
+# Dependencies TODO: Create a seperate shell script for dependencies
+if [ ! -d "$PARENT_DIR/clang-r$CLANG_VERSION" ]; then
+    mkdir -p "$PARENT_DIR/clang-r$CLANG_VERSION"
+    wget -P "$PARENT_DIR" "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-r$CLANG_VERSION.tar.gz"
+    tar -xzf "$PARENT_DIR/clang-r$CLANG_VERSION.tar.gz" -C "$PARENT_DIR/clang-r$CLANG_VERSION"
 fi
 
 if [ ! -d "$PARENT_DIR/build-tools" ]; then
@@ -146,7 +162,7 @@ for i in $(find . -name "modules.*" -type f); do
         rm -f "$i"
     fi
 done
-cd "$DIR"
+cd "$CURRENT_DIR"
 
 cp -f "$IN_DLKM/modules.load" "$MODULES_DIR/0.0/modules.load"
 mv "$MODULES_DIR/0.0"/* "$MODULES_DIR/"
@@ -166,8 +182,8 @@ $MKBOOTIMG --header_version 4 \
     --kernel "$OUT_KERNEL" \
     --output "$OUT_BOOTIMG" \
     --ramdisk "$PREBUILT_RAMDISK" \
-    --os_version 12.0.0 \
-    --os_patch_level 2024-09 || exit 1
+    --os_version 15.0.0 \
+    --os_patch_level 2025-01 || exit 1
 
 echo "Building vendor_boot image..."
 
@@ -186,11 +202,10 @@ $MKBOOTIMG --header_version 4 \
     --ramdisk_type dlkm \
     --ramdisk_name dlkm \
     --vendor_ramdisk_fragment "$(pwd)/ramdisk_dlkm.lz4" \
-    --os_version 12.0.0 \
-    --os_patch_level 2024-09 || exit 1
+    --os_version 15.0.0 \
+    --os_patch_level 2025-01 || exit 1
 
-cd "$DIR"
-
+cd "$CURRENT_DIR"
 
 echo "Building a flashable zip file (Recovery)..."
 mkdir -p "$(pwd)/kernel_build/FireAsf/$FIRE_DAY_MONTH.$FIRE_MONTH.$FIRE_YEAR"
@@ -202,7 +217,7 @@ else
   zip -r0 -q "$KERNELZIP" $TMPDIR/dtb.img anykernel.sh banner boot.img META-INF modules patch ramdisk tools vendor_boot.img
 fi
 rm -f boot.br vendor_boot.br
-cd "$DIR"
+cd "$CURRENT_DIR"
 echo "Done! Output: $KERNELZIP"
 
 echo "Building a flashable tar file (Download Mode)..."
@@ -217,10 +232,10 @@ else
   lz4 -c -1 -B6 --content-size "$OUT_VENDORBOOTIMG" > vendor_boot.img.lz4
   tar -cf "$KERNELTAR" boot.img.lz4 vendor_boot.img.lz4
 fi
-cd "$DIR"
+cd "$CURRENT_DIR"
 rm -f boot.img.lz4 vendor_boot.img.lz4
 echo "Done! Output: $KERNELTAR"
 
 echo "Cleaning..."
 rm -f "${OUT_VENDORBOOTIMG}" "${OUT_BOOTIMG}"
-kfinish
+clean_dirs
