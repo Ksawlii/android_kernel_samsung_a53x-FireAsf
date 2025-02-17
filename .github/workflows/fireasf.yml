@@ -21,8 +21,7 @@ jobs:
     - name: Install tools
       run: |
         sudo apt-get update -y || sudo apt-get update -y || true
-        sudo apt-get upgrade -y || sudo apt-get upgrade -y || true
-        sudo apt-get install brotli zip zstd tar lz4 cpio xz-utils essential checkinstall libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev -y || sudo apt-get install brotli zip zstd tar lz4 cpio xz-utils essential checkinstall libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev -y
+        sudo apt-get install brotli zip zstd tar lz4 cpio xz-utils checkinstall libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev -y || sudo apt-get install brotli zip zstd tar lz4 cpio xz-utils checkinstall libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev -y
 
     - name: Build python2
       run: |
