@@ -48,9 +48,19 @@ jobs:
         export FIREASF_VANILLA=false
         ./kernel_build/build-fireasf.sh "$(pwd)" || exit 1
 
-    - name: Upload
-      uses: actions/upload-artifact@v4
-      with:
-        name: FireAsf_a53x
-        path: kernel_build/FireAsf/${{ env.date }}/FireAsf*
+    - name: Find Fire Archives
+      id: find_archives
+      run: |
+        files=$(find kernel_build/FireAsf/${{ env.date }}/ -type f \( -name 'FireAsf*.zip' -o -name 'FireAsf*.tar' \))
+        echo "$files" | tee archive_list.txt
+        echo "files=$files" >> $GITHUB_ENV
 
+    - name: Upload Fire Archives
+      run: |
+        for file in ${{ env.files }}; do
+          name=$(basename "$file")
+          echo "Uploading $name"
+          gh run upload-artifact --name "$name" --path "$file"
+        done
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
