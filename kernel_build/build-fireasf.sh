@@ -233,7 +233,7 @@ else
   tar -cf "$KERNELTAR" boot.img.lz4 vendor_boot.img.lz4
 fi
 cd "$CURRENT_DIR"
-rm -f boot.img.lz4 vendor_boot.img.lz4
+rm -f "$(pwd)/kernel_build/boot.img.lz4" "$(pwd)/kernel_build/vendor_boot.img.lz4"
 echo "Done! Output: $KERNELTAR"
 
 echo "Cleaning..."
