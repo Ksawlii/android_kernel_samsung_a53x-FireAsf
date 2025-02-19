@@ -18,7 +18,7 @@ fi
 
 # FireAsf Variables
 FIRE_VERSION="6.0"
-FIRE_VARIANT="UnstableAsf"
+FIRE_VARIANT="StableAsf"
 FIRE_MAINTAINER="Ksawlii"
 FIRE_KBUILD="KBUILD_BUILD_USER=${FIRE_MAINTAINER} KBUILD_BUILD_HOST=FireAsFuck"
 FIRE_DAY_MONTH=$(date +%e | tr -d ' ') # Removes leading space for single-digit days
