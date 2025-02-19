@@ -18,7 +18,7 @@ fi
 
 # FireAsf Variables
 FIRE_VERSION="6.0"
-FIRE_VARIANT="UnstableAsf"
+FIRE_VARIANT="StableAsf"
 FIRE_MAINTAINER="Ksawlii"
 FIRE_KBUILD="KBUILD_BUILD_USER=${FIRE_MAINTAINER} KBUILD_BUILD_HOST=FireAsFuck"
 FIRE_DAY_MONTH=$(date +%e | tr -d ' ') # Removes leading space for single-digit days
@@ -93,11 +93,27 @@ export TARGET_SOC=s5e8825
 export LLVM=1 LLVM_IAS=1
 export ARCH=arm64
 
-
-# Clean Output Stuff
+# Custom commands
 clean_dirs() {
     rm -rf "$TMPDIR"
     rm -rf "$MODULES_OUTDIR"
+}
+
+build_configs () {
+  make -j"$(nproc --all)" -C "$(pwd)" O=out $FIRE_LOCALVERSION $FIRE_KBUILD $FIRE_DEFCONFIG >/dev/null
+}
+
+regen_configs () {
+  # Vanilla
+  make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x_defconfig >/dev/null
+  cp -fv out/.config arch/arm64/configs/a53x_defconfig
+  sed -i 's/^# CONFIG_KSU is not set$/CONFIG_KSU=n/' arch/arm64/configs/a53x_defconfig
+  # KN
+  make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x-ksu_defconfig >/dev/null
+  cp -rfv out/.config arch/arm64/configs/a53x-ksu_defconfig
+  # git
+  git add arch/arm64/configs/a53x_defconfig arch/arm64/configs/a53x-ksu_defconfig
+  git commit -m "configs: Regenerate"
 }
 
 clean_dirs
@@ -113,10 +129,17 @@ if [ ! -d "$PARENT_DIR/build-tools" ]; then
     git clone https://android.googlesource.com/platform/prebuilts/build-tools "$PARENT_DIR/build-tools" --depth=1
 fi
 
-echo ""
-echo -e "Check in btop, htop, top (whatever you use) if its building.
+if [ "$REGEN" = "true" ]; then
+  regen_configs
+  exit 0
+else
+  echo ""
+  echo -e "Check in btop, htop, top (whatever you use) if its building.
 If you have some errors when trying to rebuild, delete $OUTDIR"
-
+  START_TIME=$(date +"%Y-%m-%d %H:%M:%S")
+  START_SECONDS=$(date +%s)
+  build_configs
+fi
 make -j$(nproc --all) -C $(pwd) O=out $FIRE_LOCALVERSION $FIRE_KBUILD $FIRE_DEFCONFIG >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out $FIRE_LOCALVERSION $FIRE_KBUILD dtbs >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out $FIRE_LOCALVERSION $FIRE_KBUILD >/dev/null
@@ -235,6 +258,17 @@ fi
 cd "$CURRENT_DIR"
 rm -f "$(pwd)/kernel_build/boot.img.lz4" "$(pwd)/kernel_build/vendor_boot.img.lz4"
 echo "Done! Output: $KERNELTAR"
+
+# Build Time Stuff
+END_TIME=$(date +"%Y-%m-%d %H:%M:%S")
+END_SECONDS=$(date +%S)
+DURATION_SECONDS=$((END_SECONDS - START_SECONDS))
+DURATION_MINUTES=$((DURATION_SECONDS / 60))
+REMAINING_SECONDS=$((DURATION_SECONDS % 60))
+echo ""
+echo "Build ended at: $END_TIME"
+echo "Total time elapsed: $DURATION_MINUTES:$REMAINING_SECONDS minutes"
+echo ""
 
 echo "Cleaning..."
 rm -f "${OUT_VENDORBOOTIMG}" "${OUT_BOOTIMG}"

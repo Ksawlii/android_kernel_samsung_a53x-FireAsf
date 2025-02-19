@@ -1,4 +1,6 @@
 #!/bin/bash
+# Unset some variables
+unset REGEN
 
 command_one() {
     echo "Building without KernelSU Next..."
@@ -31,7 +33,8 @@ command_four() {
 
 command_five() {
     echo "Regenerating defconfigs"
-    ./kernel_build/regen.sh "$(pwd)" || exit 1
+    export REGEN=true
+    ./kernel_build/build-fireasf.sh "$(pwd)" || exit 1
     exit 0
 }
 
