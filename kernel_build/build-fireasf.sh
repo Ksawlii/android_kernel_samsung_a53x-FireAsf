@@ -93,11 +93,27 @@ export TARGET_SOC=s5e8825
 export LLVM=1 LLVM_IAS=1
 export ARCH=arm64
 
-
-# Clean Output Stuff
+# Custom commands
 clean_dirs() {
     rm -rf "$TMPDIR"
     rm -rf "$MODULES_OUTDIR"
+}
+
+build_configs () {
+  make -j"$(nproc --all)" -C "$(pwd)" O=out $FIRE_LOCALVERSION $FIRE_KBUILD $FIRE_DEFCONFIG >/dev/null
+}
+
+regen_configs () {
+  # Vanilla
+  make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x_defconfig >/dev/null
+  cp -fv out/.config arch/arm64/configs/a53x_defconfig
+  sed -i 's/^# CONFIG_KSU is not set$/CONFIG_KSU=n/' arch/arm64/configs/a53x_defconfig
+  # KN
+  make -j$(nproc --all) -C $(pwd) O=out $BUILD_ARGS a53x-ksu_defconfig >/dev/null
+  cp -rfv out/.config arch/arm64/configs/a53x-ksu_defconfig
+  # git
+  git add arch/arm64/configs/a53x_defconfig arch/arm64/configs/a53x-ksu_defconfig
+  git commit -m "configs: Regenerate"
 }
 
 clean_dirs
@@ -113,10 +129,15 @@ if [ ! -d "$PARENT_DIR/build-tools" ]; then
     git clone https://android.googlesource.com/platform/prebuilts/build-tools "$PARENT_DIR/build-tools" --depth=1
 fi
 
-echo ""
-echo -e "Check in btop, htop, top (whatever you use) if its building.
+if [ "$REGEN" = "true" ]; then
+  regen_configs
+  exit 0
+else
+  echo ""
+  echo -e "Check in btop, htop, top (whatever you use) if its building.
 If you have some errors when trying to rebuild, delete $OUTDIR"
-
+  build_configs
+fi
 make -j$(nproc --all) -C $(pwd) O=out $FIRE_LOCALVERSION $FIRE_KBUILD $FIRE_DEFCONFIG >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out $FIRE_LOCALVERSION $FIRE_KBUILD dtbs >/dev/null
 make -j$(nproc --all) -C $(pwd) O=out $FIRE_LOCALVERSION $FIRE_KBUILD >/dev/null
