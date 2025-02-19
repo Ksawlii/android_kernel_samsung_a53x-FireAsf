@@ -136,6 +136,8 @@ else
   echo ""
   echo -e "Check in btop, htop, top (whatever you use) if its building.
 If you have some errors when trying to rebuild, delete $OUTDIR"
+  START_TIME=$(date +"%Y-%m-%d %H:%M:%S")
+  START_SECONDS=$(date +%s)
   build_configs
 fi
 make -j$(nproc --all) -C $(pwd) O=out $FIRE_LOCALVERSION $FIRE_KBUILD $FIRE_DEFCONFIG >/dev/null
@@ -256,6 +258,17 @@ fi
 cd "$CURRENT_DIR"
 rm -f "$(pwd)/kernel_build/boot.img.lz4" "$(pwd)/kernel_build/vendor_boot.img.lz4"
 echo "Done! Output: $KERNELTAR"
+
+# Build Time Stuff
+END_TIME=$(date +"%Y-%m-%d %H:%M:%S")
+END_SECONDS=$(date +%S)
+DURATION_SECONDS=$((END_SECONDS - START_SECONDS))
+DURATION_MINUTES=$((DURATION_SECONDS / 60))
+REMAINING_SECONDS=$((DURATION_SECONDS % 60))
+echo ""
+echo "Build ended at: $END_TIME"
+echo "Total time elapsed: $DURATION_MINUTES:$REMAINING_SECONDS minutes"
+echo ""
 
 echo "Cleaning..."
 rm -f "${OUT_VENDORBOOTIMG}" "${OUT_BOOTIMG}"
