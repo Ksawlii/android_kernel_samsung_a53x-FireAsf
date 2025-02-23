@@ -2,8 +2,6 @@ name: FireAsf Auto Builds
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 10 */5 * *" # Make Builds at 10:00 AM UTC Every 5 Days
 
 jobs:
   kb:
